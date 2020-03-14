@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link href="../../css/member-style.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body style="min-height: 600px">
+<!-- 开始 -->
+<div class="my_info_title">我的资料</div>
+<div class="my_info_navList">
+  <ul>
+    <li id="listClick_1" onClick="listClick(1)" style="border-bottom: 1px solid #C40521; color: #C40521;">基本资料</li>
+    <li id="listClick_3" onClick="listClick(3)">身份认证</li>
+    <li id="listClick_4" onClick="listClick(4)">修改密码</li>
+  </ul>
+</div>
+<div class="my_info_content">
+  <table class="my_info_content_care_table">
+    <tbody>
+      <tr>
+        <td width="90" align="right" class="color555">用户名：</td>
+        <td class="color555">不科学<span class="colorCA1E37 margin_left10 font_size12">不能修改</span></td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">手机号码：</td>
+        <td class="color555">18609515574</td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">邮箱：</td>
+        <td class="color555"><input class="my_info_content_care_table_text" name="" type="text"></td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">&nbsp;</td>
+        <td class="color555"></td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">推荐人姓名：</td>
+        <td class="color555"><input class="my_info_content_care_table_text" name="" type="text">
+            <span class="color959595 margin_left10 font_size12">请您如实填写</span></td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">推荐人电话：</td>
+        <td class="color555"><input class="my_info_content_care_table_text" name="" type="text">
+            <span class="color959595 margin_left10 font_size12">请您如实填写</span></td>
+      </tr>
+      <tr>
+        <td align="right" class="color555">验证码：</td>
+        <td class="color555"><input class="my_info_content_care_table_text" name="" type="text">
+            <span class="color959595 margin_left10 font_size12">请输入验证码</span></td>
+      </tr>
+      <tr>
+        <td align="center" class="color555" colspan="2"><input class="my_info_content_care_table_submit" name="" type="submit" value="保    存"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 结束 -->
+<script type="text/javascript">
+// JavaScript Document
+$(document).ready(function(){
+	$("#my_city").citySelect({
+		prov:"北京",
+		nodata:"none"
+	});
+});
+</script>
+</body>
+</html>

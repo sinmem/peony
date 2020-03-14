@@ -1,0 +1,102 @@
+body{
+    width: 100%;
+    height: 100%;
+    background-color: #555;
+    color: rgb(204,204,204);
+}
+nav{
+    height: 32px;
+    border: none;
+}
+#search-box .container{
+    background: #333;
+    position: fixed;
+    top: 0;
+    left: 0px;
+    width: 300px;
+    padding: 4px 0px 4px 10px;
+}
+#search-box .container input.search-input{
+    color: rgb(204,204,204);
+    width: 250px;
+    height: 24px;
+    padding: 2px 4px;
+    background-color: #666;
+    border: none;
+    border-radius: 0%;
+    font-size: 14px;
+}
+/*定位*/
+.message-box{
+    position: fixed;
+    left: 450px;
+    display: none;
+}
+.tool-bar{
+    position: fixed;
+    left: 300px;
+}
+
+
+.tool-bar span{
+    color: #dde;
+    width: 20px;
+    cursor: pointer;
+    margin: 0 3px;
+    text-align: center;
+}
+.tool-bar span:hover{
+    color: #777;
+}
+.tool-bar span.disabled{
+    color: #777;
+    cursor: auto;
+}
+#search-box .container a.search-btn{
+    color: rgb(204,204,204);;
+}
+#search-box .container a.search-btn span{
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 100;
+}
+
+/*列表样式*/
+#legal-tag-list,#legal-name-list{
+    position: relative;
+    top: 8px;
+    left: 14px;
+    min-width: 500px;
+}
+#legal-tag-list .list-head,#legal-name-list .list-head{
+    color: #ccc;
+    font-weight: 600;
+}
+/*取消候选词的样式*/
+input:-internal-autofill-previewed,
+input:-internal-autofill-selected,
+textarea:-internal-autofill-previewed,
+textarea:-internal-autofill-selected,
+select:-internal-autofill-previewed,
+select:-internal-autofill-selected {
+    -webkit-text-fill-color: #fff !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+    background-color: #fff !important;
+}
+
+/*设置placehoder样式*/
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: rgb(204,204,204);
+}
+::-moz-placeholder { /* Firefox 19+ */
+    color: rgb(204,204,204);
+}
+:-ms-input-placeholder { /* IE 10+ */
+    color: rgb(204,204,204);
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: rgb(204,204,204);
+}
+ul{
+    list-style: none;
+}

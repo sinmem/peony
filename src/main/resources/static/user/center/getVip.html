@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>获取Vip</title>
+    <link href="../../css/member-style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="../../js/jquery-domResize.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="../../js/format.js"></script>
+    <script>
+        function sGetSVip() {
+            var time = parseInt($("input[name=renewalsTime]").val().trim());
+            if (isNaN(time)) {
+                parent.$popup.toast("请输入正确数字", 1);
+                return;
+            }
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + getSVipPoints(time) + "积分, 您将获得" + time + "天高级会员权限. 是否确认续费高级会员?", function () {
+                doRenewals("/renewalsSVip",{time:time});
+            })
+        }
+
+        function sGetVip() {
+            var time = parseInt($("input[name=renewalsTime]").val().trim());
+            if (isNaN(time)) {
+                parent.$popup.toast("请输入正确数字", 1);
+                return;
+            }
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + getVipPoints(time) + "积分, 您将获得" + time + "天高级会员权限. 是否确认续费高级会员?", function () {
+                doRenewals("/renewalsVip",{time:time});
+            })
+        }
+
+        function getSVip() {
+            var time = 30;
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + getSVipPoints(time) + "积分, 您将获得" + time + "天高级会员权限. 是否确认续费高级会员?", function () {
+                doRenewals("/renewalsSVip",{time:time});
+            })
+        }
+
+        function getVip() {
+            var time = 10;
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + getVipPoints(time) + "积分, 您将获得" + time + "天高级会员权限. 是否确认续费高级会员?", function () {
+                doRenewals("/renewalsVip",{time:time});
+            })
+        }
+
+        function dRenewalsVip() {
+            var time = 30;
+            renewalsVip(getSVipPoints(time), time);
+        }
+
+        function dRenewalsSVip() {
+            var time = 30;
+            renewalsSVip(getVipPoints(time), time);
+        }
+
+
+        function selfRenewalsSVip() {
+            var time = parseInt($("input[name=sVipTime]").val().trim());
+            if (isNaN(time)) {
+                parent.$popup.toast("请输入正确数字", 1);
+                return;
+            }
+            renewalsSVip(getSVipPoints(time), time);
+        }
+
+        function selfRenewalsVip() {
+            var time = parseInt($("input[name=VipTime]").val().trim());
+            if (isNaN(time)) {
+                parent.$popup.toast("请输入正确数字", 1);
+                return;
+            }
+            renewalsVip(getSVipPoints(time), time);
+        }
+
+        function getSVipPoints(time) {
+            return time * 5;
+        }
+        function getVipPoints(time) {
+            return time * 3;
+        }
+
+        function renewalsSVip(points, time) {
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + points + "积分, 您将获得" + time + "天超级会员权限. 是否确认续费超级会员?", function () {
+                doRenewals("/renewalsSVip",{time:time});
+            })
+        }
+        function renewalsVip(points, time) {
+            parent.$popup.confirm("续费确认", "该操作将扣除您" + points + "积分, 您将获得" + time + "天高级会员权限. 是否确认续费高级会员?", function () {
+                doRenewals("/renewalsVip",{time:time});
+            })
+        }
+
+        function doRenewals(url, data) {
+            $.post("/user/points"+url, data, function (data) {
+                if(data.code === 0){
+                    parent.success("操作成功!", "/user/member-center.html");
+                }else {
+                    parent.toastERR(data.message);
+                }
+            }, "json")
+                .fail(function (e) {
+                    parent.toastSERR();
+                })
+        }
+
+        var vVue;
+        $(function () {
+            vVue = new Vue({
+                el: "#vip-container",
+                data: {
+                    usr: parent.usrVue.usr,
+                    myVip: {
+                        vipStatus: true,
+                        vipDueTime: new Date(),
+                        sVipStatus: true,
+                        sVipDueTime: new Date(),
+                    },
+                },
+                filters:{
+                    formatDate:function (date) {
+                        return formatDate(date,"yyyy年MM月dd日");
+                    }
+                }
+            })
+            $("body").bind("resize", function () {
+                parent.reInitIframe();
+            });
+        })
+    </script>
+</head>
+<body style="min-height: 600px">
+<div class="my_info_title">获取Vip</div>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="my_account.html">我的积分</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="account_detail.html">积分支取明细</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="my_invited.html">我的邀请</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="#">获取Vip</a>
+        </li>
+    </ul>
+</div>
+<div class="container" id="vip-container">
+    <h5>XXX网会员权限说明:</h5>
+    <div id="member-info">
+        <div class="card">
+            <a class="card-link" data-toggle="collapse" href="#collapseA">
+                <div class="card-header">
+                    普通会员
+                </div>
+            </a>
+            <div id="collapseA" class="collapse show" data-parent="#member-info">
+                <div class="card-body">
+                    #1 内容：功能点...！！
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <a class="card-link" data-toggle="collapse" href="#collapseB">
+                <div class="card-header">
+                    高级会员
+                </div>
+            </a>
+            <div id="collapseB" class="collapse" data-parent="#member-info">
+                <div class="card-body">
+                    #1 内容：功能点...！！！
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <a class="card-link" data-toggle="collapse" href="#collapseC">
+                <div class="card-header">
+                    超级会员
+                </div>
+            </a>
+            <div id="collapseC" class="collapse" data-parent="#member-info">
+                <div class="card-body">
+                    #1 内容：功能点...！！！
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+
+            <div v-if="!(myVip.vipStatus||myVip.sVipStatus)">
+                您还没有获取Vip权限,您可以<a href="javascript:;" class="card-link">点击获取Vip权限</a> 或者<a href="javascript:;"
+                                                                                           class="card-link">点击获取SVip权限</a>
+            </div>
+            <div v-else-if="myVip.sVipStatus">
+                <p class="card-text">
+                    您的权限: <span class="font-weight-bold ml-2 mr-2"> 超级会员</span>
+                    <span class="card-text badge badge-success">{{myVip.sVipDueTime|formatDate}}到期</span>
+                    <button class="btn btn-sm btn-primary ml-5" onclick="dRenewalsSVip()">续费</button>
+                    <a href="#svipBollapse" data-toggle="collapse" class="card-link float-right">更多天数</a>
+                <div id="svipBollapse" class="collapse">
+                    <div class="card-body input-group mb-3 input-group-sm">
+                        <input type="text" class="form-control" placeholder="请输入天数" name="sVipTime">
+                        <div class="input-group-append">
+                            <span class="input-group-text">天</span>
+                            <input class="btn btn-primary btn-sm" type="button" value="确认续费"
+                                   onclick="selfRenewalsSVip()">
+                        </div>
+                    </div>
+                </div>
+                </p>
+
+            </div>
+            <div v-else-if="myVip.vipStatus">
+                <p class="card-text">
+                    您的权限: <span class="font-weight-bold ml-2 mr-2"> 高级会员</span>
+                    <span class="card-text badge badge-success">{{myVip.vipDueTime|formatDate}}到期</span>
+                    <button class="btn btn-sm btn-primary ml-5" onclick="dRenewalsVip()">续费</button>
+                    <a href="#vipBollapse" data-toggle="collapse" class="card-link float-right">更多天数</a>
+                <div id="vipBollapse" class="collapse">
+                    <div class="card-body input-group input-group-sm">
+                        <input class="form-control" type="text" placeholder="请输入天数" name="vipTime">
+                        <div class="input-group-append">
+                            <span class="input-group-text">天</span>
+                            <input class="btn btn-primary btn-sm" type="button" value="确认续费"
+                                   onclick="selfRenewalsVip()">
+                        </div>
+                    </div>
+                </div>
+                </p>
+            </div>
+            <div v-else>
+                <p class="card-text">
+                    操作:
+                    <button class="btn btn-sm btn-primary ml-5" onclick="getSVip()">开通超级会员</button>
+                    <button class="btn btn-sm btn-primary ml-5" onclick="getVip()">开通高级会员</button>
+                    <a href="#collapse" data-toggle="collapse" class="card-link float-right">更多天数</a>
+                <div id="collapse" class="collapse">
+                    <div class="card-body input-group input-group-sm">
+                        <input class="form-control" type="text" placeholder="请输入天数" name="renewalsTime">
+                        <div class="input-group-append">
+                            <span class="input-group-text">天</span>
+                            <input class="btn btn-primary btn-sm" type="button" value="开通超级会员" onclick="sGetSVip()">
+                            <input class="btn btn-primary btn-sm" type="button" value="开通高级会员" onclick="sGetVip()">
+                        </div>
+                    </div>
+                </div>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

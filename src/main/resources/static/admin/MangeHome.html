@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>管理页</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
+    <script src="../js/MangeSearch.js"></script>
+    <script src="../js/format.js"></script>
+    <link href="../css/searchStyle.css" rel="stylesheet">
+    <script src="../js/popup.js"></script>
+    <link href="../css/popup.css" rel="stylesheet">
+    <style>
+        body{
+            background: #999;
+            color: aliceblue;
+        }
+        #header{
+            height: 80px;
+
+        }
+        #left-nav{
+            position: fixed;
+            left: 0px;
+            top: 80px;
+            overflow: hidden;
+            width: 200px;
+            bottom: 0px;
+            background: #777;
+        }
+        /*#top-nav{*/
+        /*    background-color: #666;*/
+        /*        position: fixed;*/
+        /*    left: 200px;*/
+        /*    top: 60px;*/
+        /*    width: 100%;*/
+        /*    height: 20px;*/
+        /*}*/
+        #right-con{
+            background-color: #555;
+            position: fixed;
+            left: 200px;
+            top: 80px;
+            /*top: 80px;*/
+            width: 100%;
+            height: 100%;
+        }
+        div.d-flex.flex-column.text-center a,#header a{
+            color: rgb(224,234,234);;
+            font-weight: bolder;
+            text-decoration: none;
+        }
+        div.d-flex.flex-column.text-center a:hover{
+            background-color: #8c959d;
+        }
+        #fileWindow{
+            width: 100%;
+            height: 100%;
+        }
+        #right-con{
+
+        }
+        .modal-content{
+            color: #000;
+        }
+    </style>
+    <script>
+        var $popup = new popup();
+        $(function () {
+            listResize();
+        })
+        $(window).resize(function () {
+            listResize();
+        })
+        function listResize() {
+            let currentWidth = $(window).width()-$("#left-nav").width(),
+                currentHeight = $(window).height()-$("#header").height();
+            $("#right-con").width(currentWidth)
+            $("#right-con").height(currentHeight);
+            // console.log($(".list-group").width())
+            // $.child(".list-group").width(currentWidth-100)
+        }
+        function toast(msg, time, fn) {
+            if(time){
+                $popup.toast(msg,time);
+            }else{
+                $popup.toast(msg,2);
+            }
+            if(fn){
+                setTimeout(function () {
+                    fn();
+                },time*1000);
+            }
+        }
+    </script>
+</head>
+<body>
+<div id="header" class="mt-3">
+    <h2 class="d-inline">XXX后台管理系统</h2>
+    <a href="../laws/searchLaw.html" class="float-right"><span>返回主页</span></a>
+</div>
+<div id="left-nav">
+    <div class="d-flex flex-column text-center">
+        <a href="tagMange.html" target="fileWindow" class="p-1 ">标签管理</a>
+        <a href="caseMange.html" target="fileWindow" class="p-1 ">案例管理</a>
+        <a href="remarkMange.html" target="fileWindow" class="p-1 ">备注管理</a>
+        <a href="remarkList.html" target="fileWindow" class="p-1 ">备注申请</a>
+        <a href="doCase.html" target="fileWindow" class="p-1 ">案例申请</a>
+    </div>
+</div>
+<!--<div id="top-nav" class="">0000</div>-->
+<div id="right-con" class="">
+    <iframe id="fileWindow" name="fileWindow" src="tagMange.html" style="width: 100%;height: 100%;" frameborder="no"></iframe>
+</div>
+</body>
+<div id="tagModal" class="modal fade" tabindex="-1" data-backdrop="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                标签名: <input type="text" name="newTag" id="legalCase" placeholder="请输入新标签"/><br>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-primary btnSure">添加</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div id="DialogModal" class="modal fade" tabindex="-1" data-backdrop="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">提交确认- <span></span></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <label></label><span id="cname"></span>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-primary btnSure">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div id="logModal" class="modal fade" tabindex="-1" data-backdrop="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<div id="contentModal" class="modal fade" tabindex="-1" data-backdrop="true" >
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px;">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="max-height: 500px; overflow-y: scroll;">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-text content-title text-center"></h5>
+                        <p class="card-text content-time text-right small text-secondary"></p>
+                        <p class="card-text content-content " style="text-indent:2em"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<script>
+    /**
+     * @param title 标题
+     * @param action 目标地址
+     * * @param tdata 数据
+     */
+    function showtagModal(title, action, tdata) {
+        $("#tagModal").modal("show");
+        $("#tagModal .modal-title").html(title);
+        let btn = $("#tagModal .btnSure");
+        // 要取消模态框中确认按钮先前绑定的事件
+        btn.unbind("click")
+        btn.bind('click', function () {
+            let newTag = $("#tagModal .modal-body input[name=newTag]").val();
+            // console.log("new"+newTag);
+            let data = tdata;
+            data["tagName"] = newTag;
+            showDialogModal("标签修改确认", "是否将选中标签修改为: ", newTag, function () {
+                console.log(data);
+                $.post(action, data, function (data) {
+                    if(data.code == 0){
+                        parent.showLogModal("页面提示","操作成功3S后刷新页面")
+                        setTimeout(function () {
+                            window.location.href = "/admin/MangeHome.html";
+                        },3000)
+                    }else{
+                        parent.showLogModal("页面提示","操作失败: "+ data.message)
+                    }
+                }, "json")
+            })
+            $("#tagModal").modal("hide");
+        })
+
+    }
+
+    /**
+     *
+     * @param title 标题
+     * @param label 抬头
+     * @param content 内容
+     * @param callback 回调函数
+     */
+    function showDialogModal(title, label, content, callback) {
+        $("#DialogModal .modal-title span").html(title);
+        $("#DialogModal .modal-body label").html(label);
+        $("#DialogModal .modal-body span#cname").html(content);
+        $("#DialogModal").modal("show");
+        let btn = $("#DialogModal .btnSure");
+        // 要取消模态框中确认按钮先前绑定的事件
+        btn.unbind("click")
+        btn.bind('click', function () {
+            content = $("#DialogModal input[name=name]").val();
+            callback.call(this, content);
+            $("#DialogModal").modal("hide");
+        })
+    }
+
+    function showContentModal(title, obj) {
+        $("#contentModal .modal-title").html(title);
+        console.log("content", obj);
+        if(obj){
+            $("#contentModal .modal-body .card .card-body .content-title").html(obj.fullName+" 第"+obj.no+"条");
+            $("#contentModal .modal-body .card .card-body .content-time").html(formatDate(obj.updateTime,"申请时间: yyyy-MM-dd hh:mm:ss"));
+            $("#contentModal .modal-body .card .card-body .content-content").html(obj.content);
+        }
+        $("#contentModal").modal("show");
+    }
+
+    function showLogModal(title, msg) {
+        $("#logModal .modal-title").html(title);
+        $("#logModal .modal-body").html(msg);
+        $("#logModal").modal("show");
+    }
+
+    /**
+     * 模态框水平居中
+     * @param {Object} dialog 那个模态框
+     * @param {Number} revised 高度调整修正值(向上为正)
+     */
+    function valign(dialog, revised){
+        revised = Number.parseInt(revised);
+        //获得浏览器视口高度
+        var height=$(window).height();
+        //设置窗口居中
+        dialog.css("margin-top",(height-200-revised)/2+"px")
+    }
+
+    $(function(){
+        let dialog=$("#DialogModal .modal-dialog");
+        //修改窗口宽度
+        dialog.css("width","500px");
+        valign(dialog,0);
+        dialog=$("#logModal .modal-dialog");
+        //修改窗口宽度
+        dialog.css("width","500px");
+        valign(dialog,0);
+        dialog=$("#tagModal .modal-dialog");
+        dialog.css("width","500px");
+        dialog=$("#contentModal .modal-dialog");
+        dialog.css("width","800px");
+        valign(dialog,200);
+
+    })
+</script>
+</html>

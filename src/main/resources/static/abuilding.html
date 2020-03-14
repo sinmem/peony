@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>施工中...</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="content-box">
+    <div class="img-box">
+        <img src="img/0v0.png" title="您所请求的页面正在施工中暂未开放, 后期有望开放!">
+    </div>
+    <div class="tip-info">您所请求的页面正在施工中暂未开放, 后期有望开放! <br>
+        若需访问其他页面<a href="/" title="首页"><span class="fa fa-home">请点这里</span></a><br>
+        若需返回上一页<a href="javascript:;" title="上一页" onclick="javascript:history.go(-1);"><span class="fa fa-arrow-left">可点击这里</span></a>
+    </div>
+</div>
+</body>
+<script>
+    vAlign()
+    $(window).resize(function () {
+        vAlign();
+    })
+    function vAlign() {
+        var boxHeight = $(".content-box").height(),
+            wHeight = $(document).height();
+        if(wHeight<340){
+            $(".content-box").css('marginTop',0);
+        }
+        $(".content-box").css('marginTop',(wHeight-boxHeight)/2-50);
+        setTimeout(function () {
+            $(".content-box").css("visibility","visible")
+        },100);
+    }
+</script>
+</html>

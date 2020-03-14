@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>XXxxx - 个人中心</title>
+    <link rel="stylesheet" type="text/css" href="../css/popup.css">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/member-style.css" rel="stylesheet">
+    <link href="../css/usr_center.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="../js/jquery-domResize.js"></script>
+    <script type="text/javascript" src="../js/popup.js"></script>
+    <script type="text/javascript" src="../js/myAjax.js"></script>
+    <!--    <script src="../js/basics.js"></script>-->
+    <!--    <script src="../js/usr_center.js"></script>-->
+    <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script>
+        var usrVue;
+        var $popup = new popup();
+        var roleArray = {"ROLE_ADMIN": "管理员", "ROLE_SVIP": "超级会员", "ROLE_VIP": "高级会员", "USER": "普通会员"};
+        $(function () {
+            usrVue = new Vue({
+                el: "#uContainer",
+                data: {
+                    usr: {
+                        nickName: "sinmem",
+                        phone: "151****5314",
+                        roles: undefined,
+                    }
+                },
+                filters: {
+                    nameFilter: function (name, phone) {
+                        if (name)
+                            if (!(name.trim().length === 0))
+                                return name.trim();
+                        if (!phone)
+                            return "???";
+                        return "P" + phone.substring(0, 3) + "****" + phone.substring(7, 11);
+                    },
+                    roleFilter: function (roles) {
+                        console.log(roles);
+                        if (roles) {
+                            var roleArr = [];
+                            for (var i in roles) {
+                                roleArr.push(roles[i].role);
+                            }
+                            if (roleArr.length > 0) {
+                                for (var roleItem in roleArray) {
+                                    if (roleArr.includes(roleItem)) {
+                                        return roleArray[roleItem]
+                                    }
+                                }
+                                return "无效用户类型";
+                            }
+                        }
+                    },
+                }
+            });
+            getUsr();
+            $("#usr_lnav_iframe").on("load", function (e, t, n) {
+                reInitIframe();
+            });
+        });
+
+        function getUsr() {
+            $.get("/me", {}, function (data) {
+                if (data.code === 0) {
+                    console.log(data);
+                    usrVue.usr = data.content;
+                } else {
+                    toastERR(data.message)
+                }
+            },"json").fail(function (err) {
+                toastSERR();
+            })
+        }
+        function toastSERR() {
+            $popup.toast("很抱歉, 服务器开小差啦 T_T", 2)
+        }
+        function toastERR(msg) {
+            $popup.toast("很抱歉, 操作失败!"+msg, 2);
+        }
+        function toast(msg) {
+            $popup.toast(msg, 2);
+        }
+        function success(msg, url) {
+            $popup.toast(msg,2);
+            setTimeout(function () {
+                toHref(url);
+            },2000);
+        }
+
+        function reInitIframe() {
+            var frame_content = $("#usr_lnav_iframe");
+            var mainheight = frame_content.contents().find("body").height();
+            frame_content.height(Math.max(mainheight, 600));
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <div class="container">
+        <span class="navbar-text">
+            某经融公司首页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;官方咨询电话：***-***-****
+        </span>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="../home.html" target="_self"><i class="fa fa-home">主页</i> </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../abuilding.html" target="_blank">某某网</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="auth/register.html" target="_blank">&nbsp;注册&nbsp;</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="auth/login.html" target="_blank">&nbsp;登录&nbsp;</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="container navbar navbar-expand-md ">
+        <span class="logo-box mr-5">
+            <img src="../img/logo.png">
+        </span>
+        <ul class="ml-5 navbar-nav">
+            <li class="nav-item"><a class="nav-link text-dark" href="../home.html" target="_self"><i class="fa fa-home"></i>首页</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="../abuilding.html" target="_self">平台公示</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="../abuilding.html" target="_self">服务</a></li>
+            <li class="nav-item"><a class="nav-link text-dark" href="../abuilding.html" target="_self"><i class="fa fa-info-circle" aria-hidden="true"></i>新手指南</a></li>
+        </ul>
+    </div>
+</div>
+<!-- 核心 开始 -->
+<div id="uContainer" class="container card" style="padding: 0px;">
+    <div class="card-body" style="padding: 0px;">
+        <div class="row">
+            <nav id="vertical_navigation" class="navbar bg99CCFF navbar-dark col-md-3 col-lg-3 col-xl-3">
+                <div class="dead_pic">
+                    <i class="fa fa-user user-logo"></i><br>
+                    <div class="username">{{usr.username|nameFilter(usr.phoneNumber)}}</div>
+                    <div class="usertype ml-0">{{usr.roles|roleFilter}}</div>
+                </div>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><span class="navbar-text uliText-CCCCFF">我的信息</span></li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/my_info.html" target="left"> 基本信息 </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="../abuilding.html" target="left"> 身份认证 </a></li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/reset-pwd.html" target="left"> 修改密码 </a></li>
+                    <li class="nav-item"><span class="navbar-text uliText-CCCCFF">我的账户</span></li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/my_account.html" target="left"> 我的积分 </a></li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/account_detail.html" target="left"> 积分支取明细 </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/my_invited.html" target="left"> 我的邀请 </a></li>
+                    <li class="nav-item"><a class="nav-link navbar-brand ml-2" href="center/getVip.html" target="left"> 获取VIP </a></li>
+                </ul>
+            </nav>
+            <div class="col-md-9 col-lg-9 col-xl-9 iframe-container">
+                <iframe name="left" id="usr_lnav_iframe" src="center/my_info.html" frameborder="0" scrolling="no"
+                        width="100%" onload="this.height=100"></iframe>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- 核心 结束 -->
+
+<!-- 版权 开始 -->
+<div class="container-fluid cfh_bottom">
+    <div class="cfh_container">
+        <div class="cfh_bottom_qsss">
+            <dl>
+                <dt>轻松上手</dt>
+                <dd><a href="" target="_blank">如何投资</a></dd>
+                <dd><a href="" target="_blank">如何融资</a></dd>
+                <dd><a href="" target="_blank">平台协议下载</a></dd>
+                <dd><a href="" target="_blank">关于我们</a></dd>
+            </dl>
+        </div>
+        <div class="cfh_bottom_aboutours">
+            <dl>
+                <dt>关于我们</dt>
+                <dd><a href="" target="_blank">股东背景</a></dd>
+                <dd><a href="" target="_blank">某某某团队</a></dd>
+                <dd><a href="" target="_blank">法律服务</a></dd>
+                <dd><a href="" target="_blank">招贤纳士</a></dd>
+            </dl>
+        </div>
+        <div class="cfh_bottom_callme">
+            <dl>
+                <dt class="cfh_bottom_call_me"><span class="glyphicon glyphicon-earphone"></span>&nbsp;***-***-****</a>
+                </dt>
+                <dd>投资人服务邮箱：<a href="mailto:123456@qq.com" target="_blank">123456@qq.com</a></dd>
+                <dd>创业者服务邮箱：<a href="mailto:123456@qq.com" target="_blank">123456@qq.com</a></dd>
+                <dd>公司地址：xx市xx区xx街道9527号</dd>
+            </dl>
+        </div>
+        <div class="box50"></div>
+    </div>
+    <div class="container-fluid background_color545454">
+        <div class="container text-center"> Copyright © 2019 某某某 | XXXXXxxx.+有限公司 | 京ICP备12345678号-9</div>
+    </div>
+    <!-- 版权 结束 -->
+</div>
+</body>
+</html>

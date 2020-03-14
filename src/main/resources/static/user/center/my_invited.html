@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的邀请</title>
+    <link href="../../css/member-style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../css/popup.css">
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="../../js/jquery-domResize.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script type="text/javascript" src="../../js/popup.js"></script>
+    <script type="text/javascript" src="../../js/my-vue-tab2.js"></script>
+    <script type="text/javascript" src="../../js/format.js"></script>
+    <script>
+    function copyMyCode() {
+        parent.toast("已复制验证码, 你可以分享给您的朋友,如果失败请手动复制", 2);
+        var inp =document.createElement('input');
+        $("#copyData").parent().append(inp)
+        $(inp).val($("#copyData").html());
+        inp.select();
+        document.execCommand('copy',false);
+        inp.remove();
+    }
+
+
+    function doInvite() {
+            var data = $("input[name=inviteCode]").val().trim();
+            if(!data){
+                parent.toastERR("请输入正确的邀请码格式");
+                return;
+            }else if(data.length===0){
+                parent.toastERR("请输入正确的邀请码格式");
+                return;
+            }
+            $.post("/user/points/doInvite",{inviteCode:data},function (data) {
+                if(data.code===0){
+                    parent.success("填写成功", "/user/member-center.html");
+                }else{
+                    parent.toastERR("填写失败!"+data.message);
+                }
+            }, "json").fail(function (err) {
+                parent.toastSERR();
+            })
+        }
+
+    var accVue;
+        $(function () {
+            var $d = [
+                {id:1,createTime:"2020-2-22 16:54:00", pointsCount:1005,pointsDetail:5,detailType:"BONUS"},
+                {id:2,createTime:"2020-2-21 11:41:00", pointsCount:995,pointsDetail:-5,detailType:"OTHERS"},
+                {id:3,createTime:"2020-1-22 12:58:00", pointsCount:990,pointsDetail:10,detailType:"INVITE"},
+                {id:4,createTime:"2020-2-25 18:14:00", pointsCount:1000,pointsDetail:5,detailType:"BONUS"},
+            ]
+            accVue = new Vue({
+                el:".container",
+                data:{
+                    myCode:undefined,
+                    myInviter:{phoneNumber:undefined},
+                    invitePage:{
+                        pageContent:$d,
+                        pageNum:1,//页码(当前页1到pages)
+                        pageSize:10,//分页大小
+                        total:100,//总条数
+                        pages:10,// 总页数,
+                        offset:1,
+                        limit:6
+                    }
+                },
+                components:{
+                    'vue-table':myVueTab2
+                },
+                filters:{
+                    phoneFilter: function (phone) {
+                        if (!phone)
+                            return "???";
+                        return "P" + phone.substring(0, 3) + "****" + phone.substring(7, 11);
+                    },
+                    inviteCodeFilter:function (myCode) {
+                        if(!myCode){
+                            return "无效邀请码";
+                        }
+                        return myCode;
+                    }
+                },
+                methods:{
+                    callback:function (pageNumber, detailType) {
+                        switch (detailType) {
+                            case 4:getInvitePage(pageNumber);break;
+                        }
+                    }
+                }
+            });
+
+            $("#copyData").bind("copy", function (e) {
+                var cpTxt = "复制的数据";
+                var clipboardData = window.clipboardData; //for IE
+                if (!clipboardData) { // for chrome
+                    clipboardData = e.originalEvent.clipboardData;
+                }
+                var result = clipboardData.getData("text")+":"+cpTxt;
+                //e.clipboardData.getData('text');//可以获取用户选中复制的数据
+                clipboardData.setData('Text', result);
+                $('p').text(result);
+                return false;//否则设不生效
+            });
+
+            function getInvitePage(pageNumber) {
+                getInvitedList(pageNumber);
+            }
+            init();
+        });
+        function init() {
+            getCode();
+            $.get("/user/points/isInvited",{},function (data) {
+                if(data.code === 0){
+                    accVue.myInviter = data.content;
+                }else {
+                    parent.toastERR(data.message);
+                }
+            },"json").fail(function (err) {
+                parent.toastSERR();
+            });
+            getInvitedList(1);
+        }
+        function getCode() {
+            $.get("/user/points/getInviteCode",{},function (data) {
+                if(data.code===0){
+                    accVue.myCode = data.content;
+                }else {
+                    parent.toastERR(data.message);
+                }
+            },"json").fail(function (err) {
+                parent.toastSERR();
+            });
+        }
+        function getInvitedList(pageNumber) {
+            $.get("/user/points/getInvitedList",{
+                pageNum:pageNumber
+            },function (data) {
+                if(data.code === 0){
+                    accVue.invitePage = data.content;
+                }else {
+                    parent.toastERR(data.message);
+                }
+            },"json").fail(function (err) {
+                parent.toastSERR();
+            });
+        }
+    </script>
+</head>
+<body style="min-height: 600px">
+<div class="my_info_title">我的邀请</div>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="my_account.html">我的积分</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="account_detail.html">积分支取明细</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href=#">我的邀请</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="getVip.html">获取Vip</a>
+        </li>
+    </ul>
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text">
+                <span class="font-weight-bold">我的邀请码:</span>
+                <span class="badge badge-secondary ml-4" id="copyData">{{myCode|inviteCodeFilter}}</span>
+                <button class="btn btn-sm btn-primary ml-2" onclick="copyMyCode()">复制验证码</button> <br>
+            </p>
+            <p class="card-text">
+                <div v-if="myInviter">
+                    <span class="font-weight-bold">我的邀请人:</span>
+                    <span class="badge badge-secondary ml-4">{{myInviter.phoneNumber|phoneFilter}}</span>
+                </div>
+                <div v-else>
+                    <span class="input-group input-group-sm">
+                        <span class="font-weight-bold">我的邀请人:</span>
+                        <input class="form-control ml-4 col-3" type="text" placeholder="请输入邀请人邀请码" name="inviteCode">
+                        <button class="btn btn-sm btn-primary input-group-append " onclick="doInvite()">确认</button>
+                    </span>
+                </div>
+            </p>
+            <hr>
+            <h5 class="font-weight-bold">我的邀请记录:</h5>
+            <vue-table :page-info="invitePage" :callback="callback" :detail-type="Number(4)"></vue-table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

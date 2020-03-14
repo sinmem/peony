@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>案例申请列表</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
+    <script src="../js/MangeSearch.js"></script>
+    <link href="../css/searchStyle.css" rel="stylesheet">
+</head>
+<style>
+    div.tool-bar{
+        position: fixed;
+        left: 10px;
+        color: #cbb;
+    }
+    div.message-box{
+        position: fixed;
+        left: 80px;
+    }
+</style>
+<script>
+    let ListVue;
+    $(function () {
+        ListVue = new Vue({
+            el: "#TCase-list",
+            data: {
+                tempRemarks: [],
+                // 分页信息
+                // 分页查询地址
+                actionURL:"/web/v1/case/getDoCases",
+                // 页码
+                pageNum: 1,
+                // 页面大小
+                pageSize: 20,
+                // 总页数
+                pages: 0,
+                // 总条数
+                total: 0,
+            },
+            filters: {
+                subContent: function (content, maxSize) {
+                    maxSize == undefined ? 10 : maxSize;
+                    if(content == undefined){
+                        return "错误数据";
+                    }
+                    if(content.length > maxSize){
+                        content = content.substring(0, maxSize)+"...";
+                    }
+                    return content;
+                },
+                formatTime:function (date) {
+                    return formatDate(date, "yyyy-MM-dd hh:mm:ss")
+                },
+            },
+            methods: {
+                showContent: function(content){
+                    parent.showContentModal("案例申请详情",content)
+                }
+            }
+        })
+        showSearch();
+        $.get(ListVue.actionURL,"",function (data) {
+            console.log(data);
+            setPageInfo(data.content);
+            showPageInfo(data.content);
+            ListVue.tempRemarks = data.content.pageContent;
+            // console.log(data.content.pageContent);
+        },"json")
+    })
+    function setPageInfo(data) {
+        ListVue.pageNum =  data.pageNum;
+        ListVue.pageSize =  data.pageSize;
+        ListVue.pages =  data.pages;
+        ListVue.total =  data.total;
+    }
+    function showSearch() {
+        $(".message-box").show();
+        $("#searching").show();
+        $("#pageInfo").hide();
+        $("#searchCondition").html("查找案例申请")
+    }
+    function showPageInfo(data){
+        $("#searching").hide();
+        $("#pageInfo").show();
+        let total = 0,
+            showTotal = 0;
+        total = data.total;
+        showTotal = data.pageNum < data.pages ? data.pageSize * data.pageNum : total;
+        $("#total").html(total);
+        $("#showTotal").html(showTotal);
+    }
+
+    function adoptCase() {
+        let arr = getSelected();
+        if(arr.length>1){
+            parent.toast("该操作无法批量进行");
+            return;
+        }else if(arr.length === 0){
+            parent.toast("请选择案例");
+            return;
+        }
+        let data = {
+            "caseId":$(arr[0]).val(),
+            "lawId": $(arr[0]).parent().find("input[name=lawId]").val(),
+
+        };
+        console.log(data);
+        parent.showDialogModal("案例通过确认", "点击确认通过案例","",function () {
+            $.post("/web/v1/case/validCase",data, function (data) {
+                if(data.code === 0){
+                    parent.showLogModal("页面提示","操作成功3S后刷新页面");
+                    setTimeout(function () {
+                        parent.window.location.href = "/admin/MangeHome.html";
+                    },3000)
+                }else{
+                    parent.showLogModal("页面提示","操作失败: "+ data.message)
+                }
+            }, "json")
+        })
+    }
+
+    function rejectCase() {
+        let arr = getSelected();
+        if(arr.length>1){
+            parent.toast("该操作无法批量进行")
+            return;
+        }else if(arr.length == 0){
+            parent.toast("选项不能为空")
+            return;
+        }
+        let data = {
+            "lawIds":$(arr[0]).val().toString(),
+        }
+        console.log(data);
+        parent.showDialogModal("案例驳回确认", "是否删除选中法条的标签","",function () {
+            $.post("/web/v1/case/delCase",data, function (data) {
+                if(data.code == 0){
+                    parent.toast("操作成功3S后刷新页面")
+                    setTimeout(function () {
+                        parent.window.location.href = "/admin/MangeHome.html";
+                    },2000)
+                }else{
+                    parent.toast("操作失败: "+ data.message)
+                }
+            }, "json")
+        })
+    }
+</script>
+<body>
+<div id="TCase-list" class="result-box">
+    <div class="result-bar">
+        <nav class="d-flex condition-box navbar navbar-expand-sm bg-dark navbar-dark">
+            <div class="message-box">
+                <span id="searching">正在查找</span>
+                <span id="pageInfo">已显示<span id="showTotal"></span>项/共<span id="total"></span>项</span>
+            </div>
+            <div class="tool-bar">
+                <span class="fa fa-check disabled fa-other" title="通过" onclick="adoptCase()"></span>
+                <span class="fa fa-close disabled fa-other" title="驳回" onclick="rejectCase()"></span>
+            </div>
+        </nav>
+    </div>
+    <div class="result-content">
+        <table class="table table-dark table-striped table-hover table-responsive-md" id="law-list">
+            <thead>
+            <tr class="thead-light">
+                <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span class="check-box fa fa-square-o"></span></td>
+                <td>序号</td>
+                <td>法律名称</td>
+                <td>法条编号</td>
+                <td>内容</td>
+                <td>申请时间</td>
+            </tr>
+            </thead>
+            <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in tempRemarks">
+                <td class="itemCheckbox text-md-center" title="选择/取消" style="vertical-align: middle;"  onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
+                <td style="vertical-align: middle;" >{{index+1}}</td>
+                <td class="tempRemarkId">
+                    <input class="item-checkbox d-none" name="caseId" type="checkbox" :value="item.id">
+                    <input class="item-checkbox d-none" name="lawId" type="hidden" :value="item.lawId">
+                    <span class="">{{item.fullName}}</span>
+                </td>
+                <td>{{item.no}}</td>
+                <td><a class="link" title="点击预览" href="javascript:;" @click="showContent(item)">{{item.content|subContent(10)}}</a></td>
+                <td><span class="">{{item.updateTime|formatTime}}</span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="footer" class="text-center">
+        <div id="morePage" style="display: none;">
+            <span class="btn btn-secondary btn-small" onclick="getMore()">加载更多</span>
+        </div>
+    </div>
+</div>
+<script>
+    /**
+     * 格式化日期
+     * @param {Object} dateStr 要格式化的日期字符串
+     * @param {Object} fmt 格式(例:yyyy-MM-dd hh:mm:ss 另S:毫秒,q:季度)
+     */
+    function formatDate(dateStr, fmt) {
+        if(dateStr == null || dateStr == undefined){
+            return "-";
+        }
+        let date = new Date(dateStr);
+        let o = {
+            "M+": date.getMonth() + 1, //月份
+            "d+": date.getDate(), //日
+            "h+": date.getHours(), //小时
+            "m+": date.getMinutes(), //分
+            "s+": date.getSeconds(), //秒
+            "q+": Math.floor((date.getMonth() + 3) / 3), //季度
+            "S": date.getMilliseconds() //毫秒
+        };
+        if(/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for(var k in o)
+            if(new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+</script>
+</body>
+</html>

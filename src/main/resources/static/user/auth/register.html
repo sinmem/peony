@@ -1,0 +1,107 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>XXX | 注册</title>
+	<link rel="stylesheet" type="text/css" href="../../css/popup.css">
+	<link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="../../css/my-login.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script src="../../js/my-login.js"></script>
+	<script src="../../js/myAjax.js"></script>
+	<script  type="text/javascript" src="../../js/popup.js"></script>
+	<script>
+		function register() {
+			var Popup = new popup();
+			if(!checkPCP() || !checkAgree($("input[name=agree]"),"用户协议")){
+				return false;
+			}
+			$.post("/user/auth/register",
+					{
+						"phoneNumber": $("input[name=phone]").val().trim(),
+						"password": $("input[name=password]").val(),
+						"verificationCode": $("input[name=validateCode]").val().trim(),
+					},function (data) {
+						console.log(data);
+						if (data.code === 0){
+							Popup.toast("注册成功! 正在为您跳转登录页面",2);
+							toHref("/user/auth/login.html",2)
+						}else{
+							Popup.toast("注册失败!\n"+data.message,2);
+						}
+					},"json")
+					.fail(function (e) {
+						Popup.toast("登录失败!很抱歉, 服务器开小差啦",2);
+					})
+		}
+	</script>i
+</head>
+<body class="my-login-page">
+	<section class="h-100">
+		<div class="container h-100">
+			<div class="row justify-content-md-center h-100">
+				<div class="card-wrapper">
+					<div class="brand">
+						<img src="../../img/logo.jpg">
+					</div>
+					<div class="card fat">
+						<div class="card-body">
+							<h4 class="card-title">注册</h4>
+							<form method="POST">
+							 
+								<div class="form-group">
+									<label for="phone"><span class="mandatory">*</span>手机号</label>
+									<div class="phoneTip tip-waring"></div>
+									<input id="phone" type="text" class="form-control" placeholder="现支持中国大陆手机号" name="phone" required autofocus>
+								</div>
+
+								<div class="form-group">
+									<label for="validateCode"><span class="mandatory">*</span>验证码</label>
+									<div class="validateCodeTip tip-waring"></div>
+									<div class="input-group">
+										<input id="validateCode" type="text" class="input-group-addon form-control" name="validateCode" placeholder="请输入验证码" required>
+										<button onclick="getVerifyCode(this, 1)" type="button" class="input-group-addon btn btn-primary valCodeBtn">
+											获取验证码
+										</button>
+									</div>
+								</div>
+
+								<div class="form-group" title="邀请码可今后在邀请获得积分页面中填写(用户-->积分-->邀请获得积分)">
+									<label for="inviteCode">邀请码(选填)</label>
+										<input id="inviteCode" type="text" class="form-control" name="inviteCode" placeholder="请输入邀请码(可以后填写)">
+								</div>
+
+								<div class="form-group">
+									<label for="password"><span class="mandatory">*</span>密码</label>
+									<div class="passwordTip tip-waring"></div>
+									<input id="password" type="password" class="form-control" name="password" placeholder="请输入密码" required data-eye>
+								</div>
+
+								<div class="form-group">
+									<label>
+										<input type="checkbox" name="agree" value="1" required> 我同意用户协议
+										<span class="agreeTip tip-waring"></span>
+									</label>
+
+								</div>
+
+								<div class="form-group no-margin">
+									<button onclick="register(); return false;" class="btn btn-primary btn-block">
+										注册
+									</button>
+								</div>
+								<div class="margin-top20 text-center">
+									已有账号? <a href="login.html">登录</a>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="footer">
+						Copyright &copy; XXXX
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</body>
+</html>

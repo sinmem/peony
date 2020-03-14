@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>错误</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(function () {
+            vAlign();
+        })
+        $(window).resize(function () {
+            vAlign();
+        })
+        function vAlign() {
+            var boxHeight = $(".content-box").height(),
+                wHeight = $(document).height();
+            console.log(wHeight);
+            console.log(boxHeight);
+            if(wHeight<340){
+                $(".content-box").css('marginTop',0);
+            }
+            $(".content-box").css('marginTop',(wHeight-boxHeight)/2-50);
+        }
+    </script>
+</head>
+<body>
+<div class="content-box">
+    <div class="img-box">
+        <img src="img/T_T.png" title="您所请求的页面正在施工中暂未开放, 后期有望开放!">
+    </div>
+    <div class="tip-info">抱歉您的访问不存在!<br>若需访问其他页面请点<a href="/">这里</a></div>
+</div>
+</body>
+</html>

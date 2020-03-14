@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>标签管理</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
+    <script src="../js/MangeSearch.js"></script>
+    <link href="../css/searchStyle.css" rel="stylesheet">
+    <style>
+        ul.list-group{
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="result-list" class="result-box">
+    <div class="result-bar">
+        <nav class="d-flex condition-box navbar navbar-expand-sm bg-dark navbar-dark" title="切换搜索范围">
+            <div id="search-box" class="tab-content">
+                <form class="container" id="sTags" onsubmit="return false;">
+                    <input class="search-input" name="conditions" placeholder="标签查找">
+                    <a class="search-btn" onclick="sTags(this.parentElement.firstElementChild, this.firstElementChild)" title="标签搜索"><span class="fa fa-check"></span></a>
+                </form>
+            </div>
+            <div class="message-box">
+                <span id="searching">正在查找</span>
+                <span id="pageInfo">已显示<span id="showTotal"></span>项/共<span id="total"></span>项</span>
+            </div>
+            <div class="tool-bar float-right">
+                <span class="fa fa-arrow-left disabled" title="返回上一级" onclick="turnToTag()"></span>
+                <!--                <span class="fa fa-plus disabled fa-other" title="添加"></span>-->
+                <span class="fa fa-pencil disabled fa-other" title="修改" onclick="updThisTag()"></span>
+                <span class="fa fa-trash-o disabled fa-other" title="删除" onclick="delThisTag()"></span>
+            </div>
+        </nav>
+    </div>
+    <div class="result-content">
+        <ul style="display: none;" id="legal-tag-list" class="list-group">
+            <li class="list-head list-group-item disabled list-group-item-dark bg-dark" >
+                <div class="content-box text-center">标签名</div>
+            </li>
+            <div class="list-content">
+                <div class="content-box">
+                    <li class="Legal-name list-group-item list-group-item-action list-group-item-dark" v-for="(item,index) in tagList" onclick="showLawsByTag(this)">
+                        <input type="hidden" name="tagId" :value="item.id">
+                        <input type="hidden" name="tagName" :value="item.name">
+                        {{index+1}}. {{item.name}}
+                        <span class="law-content">({{item.count|countFilter}})</span>
+                    </li>
+                </div>
+            </div>
+        </ul>
+        <table class="table d-none table-striped table-hover table-dark table-responsive-md" id="law-list">
+            <thead>
+            <tr class="thead-light text-md-center">
+                <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span class="check-box fa fa-square-o"></span></td>
+                <td></td>
+                <td><h4>标签管理-{{thisTag}}</h4></td>
+            </tr>
+            </thead>
+            <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in lawList">
+                <td class="itemCheckbox text-md-center" title="选择/取消" style="vertical-align: middle;"  onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
+                <td style="vertical-align: middle;" >{{index+1}}</td>
+                <td class="content-box">
+                    <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
+                    <h5 class="Legal-name">{{item.fullName}}</h5>
+                    <span class="law-content mb-1">{{item.content|subContent(30)}}</span>
+                    <span class="release-time badge badge-dark float-right">发布时间: {{item.releaseTime.year}}</span>
+                    <div class="tags">
+                        <div v-if="item.legalTags.length > 0">
+                            <div class="law-tags-bar" v-if="item.legalTags.length <= 6">
+                                <span class="fa fa-tags">标签: </span>
+                                <span class="law-tag-span badge badge-info" disabled v-for="tagItem in item.legalTags" :title="tagItem.name">
+                                        {{tagItem.name|nameFilter(6)}}
+                                    </span>
+                                <a onclick="showLawTagbox(this)" title="展开标签">
+                                    <span class="fa fa-angle-double-down"></span>
+                                </a>
+                            </div>
+                            <div class="law-tags-bar" v-else>
+                                <span class="fa fa-tags">标签: </span>
+                                <span class="law-tag-span badge badge-info" disabled v-for="tagIndex in 5" :title="item.legalTags[tagIndex-1].name">
+                                    {{item.legalTags[tagIndex-1].name|nameFilter(6)}}
+                                </span>
+                                ...
+                                <a href="#" onclick="showLawTagbox(this)" title="展开标签">
+                                    <span class="fa fa-angle-double-down"></span>
+                                </a>
+                            </div>
+                            <div class="law-tags-box" style="display: none">
+                                <span class="fa fa-tags">标签:</span>
+                                <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
+                                    <span class="fa fa-angle-double-up"></span>
+                                </a>
+                                <div class="law-tags-container">
+                                    <a v-for="tagItem in item.legalTags" title="点击以在下方显示该标签全部法条">
+                                        <input type="hidden" value="tagItem.id">
+                                        <button class="law-tag-button badge badge-info">
+                                            <span class="fa fa-tag">{{tagItem.name}}</span>
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <span class="fa fa-tags">暂无标签: </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="footer" class="text-center">
+        <div id="morePage" style="display: none;">
+            <span class="btn btn-secondary btn-small" onclick="getMore()">加载更多</span>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
