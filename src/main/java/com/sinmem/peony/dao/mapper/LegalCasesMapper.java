@@ -1,5 +1,6 @@
 package com.sinmem.peony.dao.mapper;
 
+import com.sinmem.peony.dao.bean.CaseApplication;
 import com.sinmem.peony.dao.bean.LegalCase;
 import com.sinmem.peony.dao.bean.User;
 import com.sinmem.peony.dao.dto.LegalCaseDto;
@@ -14,8 +15,12 @@ public interface LegalCasesMapper {
     @Select("SELECT name, content,dissent_count,agree_count FROM t_legal_case WHERE is_valid = true AND law_id = #{lawId}")
     public LegalCase getCaseByLawId(Long LawId);
 
-    @Select("SELECT tlc.id, tlc.law_id, tlc.content, tlc.update_time, vl.no, vl.full_name FROM t_legal_case tlc " +
-            "LEFT JOIN v_law vl ON vl.id = tlc.law_id WHERE is_valid = false")
+
+    // 考虑到过多次数的查询效率过低,此处直接改为一次性查询
+//    @Results({@Result(property = "author", column = "author", one = @One(select = "com.sinmem.peony.dao.mapper.UserMapper.getUserById")),})
+    @Select("SELECT rs.*,tu.phone_number AS `author.phone_number`, tu.username AS `author.username`" +
+            "FROM (SELECT tlc.id, tlc.law_id, tlc.content, tlc.update_time, tlc.author AS `author.id`, vl.no, vl.full_name FROM t_legal_case tlc " +
+            "LEFT JOIN v_law vl ON vl.id = tlc.law_id WHERE is_valid = false) rs LEFT JOIN `user` tu ON rs.`author.id` = tu.id")
     ArrayList<LegalCaseDto> getCases();
 
     @Insert("INSERT INTO t_legal_case(content, law_id) VALUES(#{legalCase.content}, #{legalCase.lawId})")
@@ -55,6 +60,4 @@ public interface LegalCasesMapper {
 
     @Select("SELECT COUNT(*) FROM t_legal_case WHERE law_id = #{lawId} AND is_valid = true")
     Integer hasCase(@Param("lawId") Long lawId);
-
-
 }

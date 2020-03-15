@@ -43,8 +43,9 @@ public class DataOperationException extends RuntimeException{
         return message;
     }
 
-    public void setMessage(String message) {
+    public DataOperationException setMessage(String message) {
         this.message = message;
+        return this;
     }
 
     public DataOperationException addMessage(String msg){

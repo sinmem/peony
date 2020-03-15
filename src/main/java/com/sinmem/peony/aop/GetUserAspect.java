@@ -27,6 +27,7 @@ public class GetUserAspect {
     @Pointcut("execution(public * com.sinmem.peony.web.controller.UserPointsController.*(..))||" +
             "execution(public * com.sinmem.peony.web.controller.UserController.updateUsername(..))||" +
             "execution(public * com.sinmem.peony.web.controller.LegalCaseController.agreeCase(..))||"+
+            "execution(public * com.sinmem.peony.web.controller.LegalCaseController.CaseApplications*(..))||"+
             "execution(public * com.sinmem.peony.web.controller.LegalCaseController.disagreeCase(..))")
     public void getUser(){}
 

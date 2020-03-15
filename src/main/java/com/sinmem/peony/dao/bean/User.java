@@ -26,7 +26,7 @@ public class User extends BaseBean implements UserDetails {
     private String password;// 密码不用于序列化和反序列化
     private List<Role> roles;
     private AccountStatus accountStatus;
-    private boolean passwordStatus;
+    private transient boolean passwordStatus;
     private Date createTime;
     private Date updateTime;
 

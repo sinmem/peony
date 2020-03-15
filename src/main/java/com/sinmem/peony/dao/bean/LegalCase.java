@@ -25,8 +25,40 @@ public class LegalCase extends BaseBean {
      * 案例更新时间
      */
     private Date updateTime;
+    /**
+     * 点赞人数
+     */
     private Integer agreeCount;
+    /**
+     * 点踩人数
+     */
     private Integer dissentCount;
+    /**
+     * 案例作者
+     */
+    private User author;
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public Integer getJudgments() {
+        return judgments;
+    }
+
+    public void setJudgments(Integer judgments) {
+        this.judgments = judgments;
+    }
+
+    /**
+     * 案例关联判决书
+     */
+    private Integer judgments
+            ;
 
     public Integer getDissentCount() {
         return dissentCount;

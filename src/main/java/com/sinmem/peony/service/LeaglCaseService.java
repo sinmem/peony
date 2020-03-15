@@ -1,6 +1,8 @@
 package com.sinmem.peony.service;
 
 import com.sinmem.peony.common.Result;
+import com.sinmem.peony.common.enums.CaseStatus;
+import com.sinmem.peony.dao.bean.CaseApplication;
 import com.sinmem.peony.dao.bean.LegalCase;
 import com.sinmem.peony.dao.bean.User;
 
@@ -49,4 +51,12 @@ public interface LeaglCaseService {
     Result agreeCase(User user, Long caseId);
 
     Result getDoCases(Integer pageNum, Integer pageSize);
+
+    Result getCaseApplications(User user);
+
+    Result delCaseApplications(User user, Integer caseId);
+
+//    Result updCaseApplications(User user, CaseStatus status);
+
+    Result addCaseApplications(User user, CaseApplication caseApplication);
 }
