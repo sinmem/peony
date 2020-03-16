@@ -3,10 +3,8 @@ package com.sinmem.peony.dao.mapper;
 import com.sinmem.peony.common.enums.CaseStatus;
 import com.sinmem.peony.dao.bean.CaseApplication;
 import com.sinmem.peony.dao.bean.LegalCase;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.sinmem.peony.dao.provider.LegalCaseProvider;
+import org.apache.ibatis.annotations.*;
 
 import java.util.ArrayList;
 
@@ -17,12 +15,12 @@ public interface CaseApplicationMapper {
      * @param uid 用户id
      * @return
      */
-    @Insert("INSERT INTO case_application() VALUES()")
-    int addCaseAppByUsr(@Param("uid")Long uid, @Param("CaseApp")CaseApplication CaseApp);
+    @Insert("INSERT INTO case_application(user, legal_case, msg) VALUES(#{uid}, #{caseApp.legalCase.id}, #{caseApp.msg})")
+    Integer addCaseAppByUsr(@Param("uid")Long uid, @Param("caseApp")CaseApplication CaseApp);
 
     /**
      * 根据用户id从用户案例申请记录表中获取用户的案例申请记录
-     * @param uid
+     * @param uid 用户id
      * @return
      */
     @Select("SELECT * FROM case_application WHERE user= #{uid}")
@@ -30,26 +28,30 @@ public interface CaseApplicationMapper {
 
     /**
      * 根据id从用户案例申请记录表中更新用户的案例申请记录状态
-     * @param id
+     * @param caseId 案例id
+     * @param caseApplication 用户案例申请详细
      * @return
      */
-    @Select("UPDATE SET case_application status = #{status} WHERE id= #{id}")
-    int updCaseAppByUsr(@Param("id")Long id, @Param("status")CaseStatus status);
+    @Update("UPDATE case_application SET status = #{caseApp.status},msg = #{caseApp.msg} WHERE legal_case = #{caseId}")
+    Integer updCaseAppByUsr(@Param("caseId")Long caseId, @Param("caseApp")CaseApplication caseApplication);
 
     /**
      * 根据记录id从用户案例申请记录表中删除用户的案例申请记录
-     * @param id
+     * @param id 记录id
      * @return
      */
     @Delete("DELETE FROM case_application WHERE id= #{id}")
-    int delCaseAppByUsr(@Param("id")Integer id);
+    Integer delCaseAppByUsr(@Param("id")Integer id);
 
     /**
      * 根据记录id和用户id,判断该条记录是否有
-     * @param id
-     * @param uid
+     * @param id 记录id
+     * @param uid 用户id
      * @return
      */
     @Select("SELECT COUNT(*) FROM case_application WHERE id = #{id} AND user = #{uid}")
-    int hasRecode(@Param("id")Integer id, @Param("uid")Long uid);
+    Integer hasRecode(@Param("id")Integer id, @Param("uid")Long uid);
+
+    @UpdateProvider(type = LegalCaseProvider.class, method = "updCaseApps")
+    Integer updCaseApps(@Param("status") CaseStatus status, @Param("msg") String msg, @Param("caseIds") Long[] caseIds);
 }

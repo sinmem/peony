@@ -51,17 +51,25 @@ public class LegalCaseServiceImpl implements LeaglCaseService {
     }
 
     @Override
-    public Result getCaseApplications(User user) {
-        return Result.success(caseAppMapper.getCaseAppByUsr(user.getId()));
+    public Result getCaseApplications(User user, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum != null && pageNum >= 0 ? pageNum : 0;
+        pageSize = pageSize !=null && pageSize >= 0 && pageSize <= 50 ? pageSize : 50;
+        Page<CaseApplication> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(()->caseAppMapper.getCaseAppByUsr(user.getId()));
+        return Result.success(new ResultPage<>(page));
     }
 
     @Override
     public Result addCaseApplications(User user, CaseApplication caseApplication) {
+        caseApplication.setMsg("提交了案例");
         return Result.success(caseAppMapper.addCaseAppByUsr(user.getId(), caseApplication));
     }
 
-    public Result updCaseApplications(User user, CaseStatus status) {
-        return Result.success(caseAppMapper.updCaseAppByUsr(user.getId(), status));
+    public Result updCaseApplication(User user, CaseApplication caseApplication) {
+        return Result.success(caseAppMapper.updCaseAppByUsr(caseApplication.getLegalCase().getId(), caseApplication));
+    }
+
+    public Result updCaseApplications(CaseStatus status,String msg, Long ... caseIds) {
+        return Result.success(caseAppMapper.updCaseApps(status, msg, caseIds));
     }
 
     @Override
@@ -99,15 +107,19 @@ public class LegalCaseServiceImpl implements LeaglCaseService {
 
     @Override
     @Transactional
-    public Result validCase(Long caseId, Long lawId) {
+    public Result validCase(CaseApplication caseApp, Long lawId) {
         if(legalCasesMapper.hasCase(lawId)>0){
             throw new ValidationException(Msg.E40011).setMessage("所操作法条已有通过的案例!");
         }
-        if(legalCasesMapper.validCase(caseId) != 1){
+        if(legalCasesMapper.validCase(caseApp.getLegalCase().getId()) != 1){
             throw new ValidationException(Msg.E40011).setMessage("所操作案例不存在!");
         }
+        caseApp.setMsg("通过了案例");
+        caseApp.setStatus(CaseStatus.PASS);
+        updCaseApplication(caseApp.getUser(), caseApp);
         ArrayList<Long> ids = legalCasesMapper.getIdsByLawId(lawId);
         if(!ids.isEmpty()){
+            updCaseApplications(CaseStatus.REJECT,"已有通过案例",ids.stream().toArray(Long[]::new));
             legalCasesMapper.delCase(ids.toArray(new Long[0]));
         }
         return Result.success();

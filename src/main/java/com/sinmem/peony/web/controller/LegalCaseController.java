@@ -60,13 +60,13 @@ public class LegalCaseController {
 
     /**
      * 通过案例
-     * @param caseId
+     * @param caseApplication
      * @param lawId
      * @return
      */
     @PostMapping("/validCase")
-    public String validCase(Long caseId,Long lawId){
-        return leaglCaseService.validCase(caseId, lawId).toString();
+    public String validCase(CaseApplication caseApplication, Long lawId){
+        return leaglCaseService.validCase(caseApplication, lawId).toString();
     }
 
     /**
@@ -114,7 +114,7 @@ public class LegalCaseController {
 
     @GetMapping("/getCaseApplications")
     public String CaseApplicationsGet(User user, Integer pageNum, Integer pageSize){
-        return Result.success(leaglCaseService.getCaseApplications(user)).toString();
+        return Result.success(leaglCaseService.getCaseApplications(user,pageNum, pageSize)).toString();
     }
 
     @GetMapping("/delCaseApplication")

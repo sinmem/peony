@@ -20,5 +20,51 @@ public class CaseApplication extends BaseBean {
     private Timestamp createTime;
     private Timestamp updateTime;
 
+    public User getUser() {
+        return user;
+    }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LegalCase getLegalCase() {
+        return legalCase;
+    }
+
+    public void setLegalCase(LegalCase legalCase) {
+        this.legalCase = legalCase;
+    }
+
+    public CaseStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CaseStatus status) {
+        this.status = status;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
+    }
 }

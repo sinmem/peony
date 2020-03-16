@@ -46,13 +46,13 @@ public interface LeaglCaseService {
 
     Result disagreeCase(User user, Long caseId);
 
-    Result validCase(Long caseId, Long lawId);
+    Result validCase(CaseApplication caseApplication, Long lawId);
 
     Result agreeCase(User user, Long caseId);
 
     Result getDoCases(Integer pageNum, Integer pageSize);
 
-    Result getCaseApplications(User user);
+    Result getCaseApplications(User user, Integer pageNum, Integer pageSize);
 
     Result delCaseApplications(User user, Integer caseId);
 
