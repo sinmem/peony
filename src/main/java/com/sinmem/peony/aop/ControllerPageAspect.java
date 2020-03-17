@@ -30,6 +30,7 @@ public class ControllerPageAspect {
      * 小号分页大小
      */
     @Pointcut("execution(public * com.sinmem.peony.web.controller.LawController.get*(Integer,Integer,..))||" +
+            "execution(public * com.sinmem.peony.web.controller.JudgmentController.list*(Integer,Integer,..))||" +
             "execution(public * com.sinmem.peony.web.controller.LawController.searchOnContent(..))")
     public void sPage(){}
 

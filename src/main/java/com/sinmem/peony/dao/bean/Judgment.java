@@ -12,10 +12,19 @@ import java.sql.Timestamp;
  */
 public class Judgment extends BaseBean {
     private String title;
+    private String description;
     private User author;
     private String text;
     private Timestamp createTime;
     private Timestamp updateTime;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getTitle() {
         return title;
