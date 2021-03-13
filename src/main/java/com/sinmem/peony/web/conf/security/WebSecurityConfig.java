@@ -77,6 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/auth/**",
                 "/css/**",
                 "/js/**",
+                "/plugins/**",
                 "favicon.ico",
                 "/error.html",
                 "/404.html",

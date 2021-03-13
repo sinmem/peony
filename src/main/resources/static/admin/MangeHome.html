@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>管理页</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
+    <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
+    <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./../plugins/bootstrap/bootstrap-switch.min.css" rel="stylesheet">
     <script src="../js/MangeSearch.js"></script>
     <script src="../js/format.js"></script>
     <link href="../css/searchStyle.css" rel="stylesheet">
     <script src="../js/popup.js"></script>
     <link href="../css/popup.css" rel="stylesheet">
     <style>
-        body{
+        body {
             background: #999;
             color: aliceblue;
         }
-        #header{
+
+        #header {
             height: 80px;
 
         }
-        #left-nav{
+
+        #left-nav {
             position: fixed;
             left: 0px;
             top: 80px;
@@ -36,6 +36,7 @@
             bottom: 0px;
             background: #777;
         }
+
         /*#top-nav{*/
         /*    background-color: #666;*/
         /*        position: fixed;*/
@@ -44,7 +45,7 @@
         /*    width: 100%;*/
         /*    height: 20px;*/
         /*}*/
-        #right-con{
+        #right-con {
             background-color: #555;
             position: fixed;
             left: 200px;
@@ -53,22 +54,27 @@
             width: 100%;
             height: 100%;
         }
-        div.d-flex.flex-column.text-center a,#header a{
-            color: rgb(224,234,234);;
+
+        div.d-flex.flex-column.text-center a, #header a {
+            color: rgb(224, 234, 234);;
             font-weight: bolder;
             text-decoration: none;
         }
-        div.d-flex.flex-column.text-center a:hover{
+
+        div.d-flex.flex-column.text-center a:hover {
             background-color: #8c959d;
         }
-        #fileWindow{
+
+        #fileWindow {
             width: 100%;
             height: 100%;
         }
-        #right-con{
+
+        #right-con {
 
         }
-        .modal-content{
+
+        .modal-content {
             color: #000;
         }
     </style>
@@ -80,24 +86,26 @@
         $(window).resize(function () {
             listResize();
         })
+
         function listResize() {
-            let currentWidth = $(window).width()-$("#left-nav").width(),
-                currentHeight = $(window).height()-$("#header").height();
+            let currentWidth = $(window).width() - $("#left-nav").width(),
+                currentHeight = $(window).height() - $("#header").height();
             $("#right-con").width(currentWidth)
             $("#right-con").height(currentHeight);
             // console.log($(".list-group").width())
             // $.child(".list-group").width(currentWidth-100)
         }
+
         function toast(msg, time, fn) {
-            if(time){
-                $popup.toast(msg,time);
-            }else{
-                $popup.toast(msg,2);
+            if (time) {
+                $popup.toast(msg, time);
+            } else {
+                $popup.toast(msg, 2);
             }
-            if(fn){
+            if (fn) {
                 setTimeout(function () {
                     fn();
-                },time*1000);
+                }, time * 1000);
             }
         }
     </script>
@@ -118,7 +126,8 @@
 </div>
 <!--<div id="top-nav" class="">0000</div>-->
 <div id="right-con" class="">
-    <iframe id="fileWindow" name="fileWindow" src="tagMange.html" style="width: 100%;height: 100%;" frameborder="no"></iframe>
+    <iframe id="fileWindow" name="fileWindow" src="tagMange.html" style="width: 100%;height: 100%;"
+            frameborder="no"></iframe>
 </div>
 </body>
 <div id="tagModal" class="modal fade" tabindex="-1" data-backdrop="true">
@@ -185,7 +194,7 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
-<div id="contentModal" class="modal fade" tabindex="-1" data-backdrop="true" >
+<div id="contentModal" class="modal fade" tabindex="-1" data-backdrop="true">
     <div class="modal-dialog">
         <div class="modal-content" style="width:800px;">
             <div class="modal-header">
@@ -232,13 +241,13 @@
             showDialogModal("标签修改确认", "是否将选中标签修改为: ", newTag, function () {
                 console.log(data);
                 $.post(action, data, function (data) {
-                    if(data.code == 0){
-                        parent.showLogModal("页面提示","操作成功3S后刷新页面")
+                    if (data.code == 0) {
+                        parent.showLogModal("页面提示", "操作成功3S后刷新页面")
                         setTimeout(function () {
                             window.location.href = "/admin/MangeHome.html";
-                        },3000)
-                    }else{
-                        parent.showLogModal("页面提示","操作失败: "+ data.message)
+                        }, 3000)
+                    } else {
+                        parent.showLogModal("页面提示", "操作失败: " + data.message)
                     }
                 }, "json")
             })
@@ -272,9 +281,9 @@
     function showContentModal(title, obj) {
         $("#contentModal .modal-title").html(title);
         console.log("content", obj);
-        if(obj){
-            $("#contentModal .modal-body .card .card-body .content-title").html(obj.fullName+" 第"+obj.no+"条");
-            $("#contentModal .modal-body .card .card-body .content-time").html(formatDate(obj.updateTime,"申请时间: yyyy-MM-dd hh:mm:ss"));
+        if (obj) {
+            $("#contentModal .modal-body .card .card-body .content-title").html(obj.fullName + " 第" + obj.no + "条");
+            $("#contentModal .modal-body .card .card-body .content-time").html(formatDate(obj.updateTime, "申请时间: yyyy-MM-dd hh:mm:ss"));
             $("#contentModal .modal-body .card .card-body .content-content").html(obj.content);
         }
         $("#contentModal").modal("show");
@@ -291,28 +300,28 @@
      * @param {Object} dialog 那个模态框
      * @param {Number} revised 高度调整修正值(向上为正)
      */
-    function valign(dialog, revised){
+    function valign(dialog, revised) {
         revised = Number.parseInt(revised);
         //获得浏览器视口高度
-        var height=$(window).height();
+        var height = $(window).height();
         //设置窗口居中
-        dialog.css("margin-top",(height-200-revised)/2+"px")
+        dialog.css("margin-top", (height - 200 - revised) / 2 + "px")
     }
 
-    $(function(){
-        let dialog=$("#DialogModal .modal-dialog");
+    $(function () {
+        let dialog = $("#DialogModal .modal-dialog");
         //修改窗口宽度
-        dialog.css("width","500px");
-        valign(dialog,0);
-        dialog=$("#logModal .modal-dialog");
+        dialog.css("width", "500px");
+        valign(dialog, 0);
+        dialog = $("#logModal .modal-dialog");
         //修改窗口宽度
-        dialog.css("width","500px");
-        valign(dialog,0);
-        dialog=$("#tagModal .modal-dialog");
-        dialog.css("width","500px");
-        dialog=$("#contentModal .modal-dialog");
-        dialog.css("width","800px");
-        valign(dialog,200);
+        dialog.css("width", "500px");
+        valign(dialog, 0);
+        dialog = $("#tagModal .modal-dialog");
+        dialog.css("width", "500px");
+        dialog = $("#contentModal .modal-dialog");
+        dialog.css("width", "800px");
+        valign(dialog, 200);
 
     })
 </script>

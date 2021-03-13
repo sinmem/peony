@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>法条标签汇总</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
+    <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
+    <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./../plugins/bootstrap/bootstrap-switch.min.css" rel="stylesheet">
+    <style>
+        .flex-toolbar{
+            position: fixed;
+            right: 20px;
+            bottom: 100px;
+            font-size: 36px;
+            font-weight: bold;
+            opacity: 0.9;
+            /*background-color: rgba(151,151,151,0.5);*/
+        }
+    </style>
 </head>
-<body>
+<body class="">
 <script>
     let lawVue;
     $(function () {
@@ -28,7 +37,7 @@
                 currentType: 0,
                 // 分页信息
                 // 分页查询地址
-                actionURL:"",
+                actionURL: "",
                 // 页码
                 pageNum: 1,
                 // 页面大小
@@ -40,29 +49,27 @@
             },
             filters: {
                 countFilter: function (count) {
-                    if(count>0){
-                        return count+"条";
-                    }else {
+                    if (count > 0) {
+                        return count + "条";
+                    } else {
                         return "暂无数据"
                     }
                 },
                 nameFilter: function (name, maxSize) {
-                    if(name.length > maxSize){
-                        name = name.substring(0,maxSize-1)+"...";
+                    if (name.length > maxSize) {
+                        name = name.substring(0, maxSize - 1) + "...";
                     }
                     return name;
                 }
             },
-            methods: {
-
-            }
+            methods: {}
         });
         lawVue.actionURL = "/web/v1/tag/getAllTags";
         lawVue.currentType = 3;
         showSpinner();
         $.get(lawVue.actionURL, "",
             function (data) {
-                if(data.code == 0){
+                if (data.code == 0) {
                     showTags(data.content.pageContent);
                     setpageInfo(data.content)
                 }
@@ -73,141 +80,164 @@
     })
 </script>
 <div id="header"></div>
-<div id="content">
-    <div id="serach">
-        <ul id="search-tool-bar" class="d-inline-flex p-3 nav nav-pills">
-            <li class="p-1 nav-item">
-                <a class="nav-link" data-toggle="pill" onclick="window.location.href = 'searchLaw.html'" href="#sFullName">返回搜索页</a>
-            </li>
-            <li class="p-1 nav-item">
-                <a class="nav-link active"  data-toggle="pill" href="#" onclick="window.location.href='legalTags.html'">全部标签</a>
-            </li>
-        </ul>
-    </div>
-    <div id="result-list" class="result-box">
-        <div class="result-bar">
-        </div>
-        <div class="result-content">
-            <ul style="display: none" id="legal-tag-list" class="list-group">
-                <li class="list-head list-group-item disabled">
-                    <div class="content-box">标签名</div>
-                    <div class="message-box" title="数据查询结果">
-                        <span id="searching">正在查找</span>
-                        <span id="pageInfo">已显示<span id="showTotal">999999</span>项/共<span id="total">999999</span>项</span>
-                    </div>
-                </li>
-                <div class="list-content">
-                    <div class="content-box">
-                        <li class="Legal-name list-group-item list-group-item-action" v-for="(item,index) in tagList" onclick="showLawsByTag(this)">
-                            <input type="hidden" name="tagId" :value="item.id">
-                            {{index+1}}. {{item.name}}
-                            <span class="law-content">({{item.count|countFilter}})</span>
-                        </li>
-                    </div>
+<div CLASS="container">
+    <div class="row">
+        <div class="col-2">asdadad</div>
+        <div class="col-10" id="content">
+            <div id="search">
+                <ul id="search-tool-bar" class="d-inline-flex p-3 nav nav-pills">
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" data-toggle="pill" onclick="window.location.href = 'searchLaw.html'"
+                           href="#sFullName">返回搜索页</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link active" data-toggle="pill" href="#"
+                           onclick="window.location.href='legalTags.html'">全部标签</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="result-list" class="result-box">
+                <div class="result-bar">
                 </div>
-            </ul>
-            <table class="table table-striped table-hover table-responsive-md" style="display: none" id="law-list">
-                <thead>
-                <tr class="thead-light text-md-center">
-                    <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span class="check-box fa fa-square-o"></span></td>
-                    <td></td>
-                    <td>法条内容</td>
-                </tr>
-                </thead>
-                <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in lawList">
-                    <td class="itemCheckbox" title="选择/取消" style="vertical-align: middle;"  onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
-                    <td style="vertical-align: middle;" >{{index+1}}</td>
-                    <td class="content-box">
-                        <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
-                        <h5 class="Legal-name">{{item.fullName}}</h5>
-                        <p class="law-content mb-1">{{item.content}}</p>
-                        <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
-                        <div class="tags">
-                            <div v-if="item.legalTags.length > 0">
-                                <div class="law-tags-bar" v-if="item.legalTags.length <= 6">
-                                    <span class="fa fa-tags">标签: </span>
-                                    <span class="law-tag-span btn btn-outline-info" disabled v-for="tagItem in item.legalTags" :title="tagItem.name">
-                                        {{tagItem.name|nameFilter(6)}}
-                                    </span>
-                                    <a onclick="showLawTagbox(this)" title="展开标签">
-                                        <span class="fa fa-angle-double-down"></span>
-                                    </a>
-                                </div>
-                                <div class="law-tags-bar" v-else>
-                                    <span class="fa fa-tags">标签: </span>
-                                    <span class="law-tag-span  btn btn-outline-info" disabled v-for="tagIndex in 5" :title="item.legalTags[tagIndex-1].name">
-                                    {{item.legalTags[tagIndex-1].name|nameFilter(6)}}
-                                </span>
-                                    ...
-                                    <a href="#" onclick="showLawTagbox(this)" title="展开标签">
-                                        <span class="fa fa-angle-double-down"></span>
-                                    </a>
-                                </div>
-                                <div class="law-tags-box" style="display: none">
-                                    <span class="fa fa-tags">标签:</span>
-                                    <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
-                                        <span class="fa fa-angle-double-up"></span>
-                                    </a>
-                                    <div class="law-tags-container">
-                                        <a v-for="tagItem in item.legalTags" title="点击以在下方显示该标签全部法条">
-                                            <input type="hidden" value="tagItem.id">
-                                            <button class="law-tag-button btn btn-outline-info">
-                                                <span class="fa fa-tag">{{tagItem.name}}</span>
-                                            </button>
-                                        </a>
-                                    </div>
-                                </div>
+                <div class="result-content">
+                    <ul style="display: none" id="legal-tag-list" class="list-group">
+                        <li class="list-head list-group-item disabled">
+                            <div class="content-box">标签名</div>
+                            <div class="message-box" title="数据查询结果">
+                                <span id="searching">正在查找</span>
+                                <span id="pageInfo">已显示<span id="showTotal">999999</span>项/共<span
+                                        id="total">999999</span>项</span>
                             </div>
-                            <div v-else>
-                                <span class="fa fa-tags">暂无标签: </span>
+                        </li>
+                        <div class="list-content">
+                            <div class="content-box">
+                                <li class="Legal-name list-group-item list-group-item-action"
+                                    v-for="(item,index) in tagList" onclick="showLawsByTag(this)">
+                                    <input type="hidden" name="tagId" :value="item.id">
+                                    {{index+1}}. {{item.name}}
+                                    <span class="law-content">({{item.count|countFilter}})</span>
+                                </li>
                             </div>
                         </div>
-                        <div class="Legal-case">
-                            <input type="hidden" name="index" :value="index">
-                            <input type="hidden" name="lawId" :value="item.id">
-                            <div class="case-box" v-if="item.caseCount > 0">
-                                <span class="fa fa-link">案例: </span>
-                                <a href="#" onclick="showLawCase(this)" title="展开">
-                                    <span class="fa fa-angle-double-down"></span>
-                                </a>
-                                <a href="#" onclick="hideLawCase(this)" title="隐藏">
-                                    <span class="fa fa-angle-double-up" style="display: none"></span>
-                                </a>
-                                <div class="case-container" style="display: none">
-                                    <a v-if="item.legalCase != null" :href="item.legalCase.url" title="点击查看案例">
-                                        <input type="hidden" name="lawId" :value="item.id">
-                                        <span onclick="updCase(this)"></span>
-                                        <button class="law-tag-button btn btn-outline-info">
-                                            <span class="fa fa-link">{{item.legalCase.name}}</span>
-                                        </button>
-                                    </a>
-                                    <a v-else title="查询中请稍等" disabled>
-                                        <button class="law-tag-button btn btn-outline-info">
-                                            <span class="fa fa-link">正在查询</span>
-                                        </button>
-                                    </a>
+                    </ul>
+                    <table class="table table-striped table-hover table-responsive-md" style="display: none"
+                           id="law-list">
+                        <thead>
+                        <tr class="thead-light text-md-center">
+                            <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span
+                                    class="check-box fa fa-square-o"></span></td>
+                            <td></td>
+                            <td>法条内容</td>
+                        </tr>
+                        </thead>
+                        <tr class="list-content border-bottom border-secondary mt-1 pb-1"
+                            v-for="(item,index) in lawList">
+                            <td class="itemCheckbox" title="选择/取消" style="vertical-align: middle;"
+                                onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
+                            <td style="vertical-align: middle;">{{index+1}}</td>
+                            <td class="content-box">
+                                <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
+                                <h5 class="Legal-name">{{item.fullName}}</h5>
+                                <p class="law-content mb-1">{{item.content}}</p>
+                                <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
+                                <div class="tags">
+                                    <div v-if="item.legalTags.length > 0">
+                                        <div class="law-tags-bar" v-if="item.legalTags.length <= 6">
+                                            <span class="fa fa-tags">标签: </span>
+                                            <span class="law-tag-span btn btn-outline-info" disabled
+                                                  v-for="tagItem in item.legalTags" :title="tagItem.name">
+                                        {{tagItem.name|nameFilter(6)}}
+                                    </span>
+                                            <a onclick="showLawTagbox(this)" title="展开标签">
+                                                <span class="fa fa-angle-double-down"></span>
+                                            </a>
+                                        </div>
+                                        <div class="law-tags-bar" v-else>
+                                            <span class="fa fa-tags">标签: </span>
+                                            <span class="law-tag-span  btn btn-outline-info" disabled
+                                                  v-for="tagIndex in 5"
+                                                  :title="item.legalTags[tagIndex-1].name">
+                                    {{item.legalTags[tagIndex-1].name|nameFilter(6)}}
+                                </span>
+                                            ...
+                                            <a href="#" onclick="showLawTagbox(this)" title="展开标签">
+                                                <span class="fa fa-angle-double-down"></span>
+                                            </a>
+                                        </div>
+                                        <div class="law-tags-box" style="display: none">
+                                            <span class="fa fa-tags">标签:</span>
+                                            <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
+                                                <span class="fa fa-angle-double-up"></span>
+                                            </a>
+                                            <div class="law-tags-container">
+                                                <a v-for="tagItem in item.legalTags" title="点击以在下方显示该标签全部法条">
+                                                    <input type="hidden" value="tagItem.id">
+                                                    <button class="law-tag-button btn btn-outline-info">
+                                                        <span class="fa fa-tag">{{tagItem.name}}</span>
+                                                    </button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <span class="fa fa-tags">暂无标签: </span>
+                                    </div>
                                 </div>
-                            </div>
-                            <span class="case-box" v-else>
+                                <div class="Legal-case">
+                                    <input type="hidden" name="index" :value="index">
+                                    <input type="hidden" name="lawId" :value="item.id">
+                                    <div class="case-box" v-if="item.caseCount > 0">
+                                        <span class="fa fa-link">案例: </span>
+                                        <a href="#" onclick="showLawCase(this)" title="展开">
+                                            <span class="fa fa-angle-double-down"></span>
+                                        </a>
+                                        <a href="#" onclick="hideLawCase(this)" title="隐藏">
+                                            <span class="fa fa-angle-double-up" style="display: none"></span>
+                                        </a>
+                                        <div class="case-container" style="display: none">
+                                            <a v-if="item.legalCase != null" :href="item.legalCase.url" title="点击查看案例">
+                                                <input type="hidden" name="lawId" :value="item.id">
+                                                <span onclick="updCase(this)"></span>
+                                                <button class="law-tag-button btn btn-outline-info">
+                                                    <span class="fa fa-link">{{item.legalCase.name}}</span>
+                                                </button>
+                                            </a>
+                                            <a v-else title="查询中请稍等" disabled>
+                                                <button class="law-tag-button btn btn-outline-info">
+                                                    <span class="fa fa-link">正在查询</span>
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <span class="case-box" v-else>
                                 <span class="fa fa-link">案例: </span>
                                 <a title="点击添加" onclick="addCase(this)">暂无案例</a>
                             </span>
-                        </div>
-                        <div class="remake" @click="toRemark(item.id)">
-                            <span class="fa fa-commenting-o">备注: </span>
-                            <span class="case-box" v-if="item.remarkCount != 0">
+                                </div>
+                                <div class="remake" @click="toRemark(item.id)">
+                                    <span class="fa fa-commenting-o">备注: </span>
+                                    <span class="case-box" v-if="item.remarkCount != 0">
                                 点击查看
                             </span>
-                            <span class="case-box" v-else>
+                                    <span class="case-box" v-else>
                                 <a title="点击添加">暂无备注</a>
                             </span>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+    <div class="clearfix flex-toolbar">
+        <button class="turn-top btn btn-outline-light" title="到顶部" onclick="window.location.href = '#header'">
+            <a href="#header" class="d-block float-right" title="回到顶部"><span class="fa fa-angle-up"></span></a>
+        </button>
+
+    </div>
 </div>
+
 <div id="footer" class="text-center">
     <div id="morePage" style="display: none;">
             <span class="btn btn-secondary btn-small" onclick="getMore()">
@@ -227,6 +257,7 @@
         $("#legal-tag-list").show();
         lawVue.tagList = data;
     }
+
     function showLawsByTag(el) {
         let tag = $(el).find("input[name=tagId]").val();
         console.log(tag);
@@ -235,7 +266,7 @@
         lawVue.tag = tag;
         showSpinner();
         $.get(lawVue.actionURL,
-            {"tag":tag},
+            {"tag": tag},
             function (data) {
                 showLaws(data.content.pageContent);
                 setpageInfo(data.content)
@@ -243,6 +274,7 @@
             "json"
         )
     }
+
     /**
      * 根据数据显示法条查询结果
      * @param data
@@ -260,25 +292,27 @@
         lawVue.pageSize = data.pageSize;
         lawVue.pages = data.pages;
         lawVue.total = data.total;
-        console.log(lawVue.pages +" : "+ data.pageNum);
-        if(lawVue.pages > 0 && data.pageNum > 0){
+        console.log(lawVue.pages + " : " + data.pageNum);
+        if (lawVue.pages > 0 && data.pageNum > 0) {
             $("#footer #morePage").html("<span class='btn btn-outline-secondary btn-small disabled' disabled>没有更多了</span>")
         }
-        if(lawVue.pages == data.pageNum){
+        if (lawVue.pages == data.pageNum) {
             $("#footer #morePage").html("<span class='btn btn-outline-secondary btn-small disabled' disabled>没有更多了</span>")
-        }else if(lawVue.pages > data.pageNum){
+        } else if (lawVue.pages > data.pageNum) {
             $("#footer #morePage").html("<span class='btn btn-primary btn-small' onclick='getMore()'><span id='fa-spinner' class='fa fa-spinner fa-pulse'></span>加载更多</span>")
         }
         showPageInfo(data);
 
     }
+
     function showSearch() {
         $(".message-box").show();
         $("#searching").show();
         $("#pageInfo").hide();
         $("#searchCondition").html("查找备注申请")
     }
-    function showPageInfo(data){
+
+    function showPageInfo(data) {
         $("#searching").hide();
         $("#pageInfo").show();
         hideSpinner();
@@ -289,13 +323,16 @@
         $("#total").html(total);
         $("#showTotal").html(showTotal);
     }
+
     /*浮动导航栏--及其工具修正*/
     function hideSpinner() {
         $("#fa-spinner").hide();
     }
+
     function showSpinner() {
         $("#fa-spinner").show();
     }
+
     function showSearch(data) {
         $(".message-box").show();
         $("#searching").show();
@@ -307,28 +344,28 @@
     function getMore() {
         console.log("getMore");
         let data = {
-            "pageNum": lawVue.pageNum = lawVue.pageNum >= lawVue.total? lawVue.total: ++lawVue.pageNum,
+            "pageNum": lawVue.pageNum = lawVue.pageNum >= lawVue.total ? lawVue.total : ++lawVue.pageNum,
             "pageSize": lawVue.pageSize,
-            "tag":lawVue.tag,
+            "tag": lawVue.tag,
         };
         console.log(data);
         showSearch();
         $.get(lawVue.actionURL, data, function (data) {
-            console.log("currentType: "+ lawVue.currentType);
-            console.log("actionURL: "+ lawVue.actionURL);
-            if(lawVue.currentType === 0){
+            console.log("currentType: " + lawVue.currentType);
+            console.log("actionURL: " + lawVue.actionURL);
+            if (lawVue.currentType === 0) {
                 return;
-            }else if(lawVue.currentType === 2){
+            } else if (lawVue.currentType === 2) {
                 data.content.pageContent.forEach(function (item) {
                     lawVue.lawList.push(item)
                 })
-            }else if(lawVue.currentType === 3){
+            } else if (lawVue.currentType === 3) {
                 data.content.pageContent.forEach(function (item) {
                     lawVue.tagList.push(item)
                 })
             }
             setpageInfo(data.content)
-        },"json")
+        }, "json")
     }
 </script>
 </html>

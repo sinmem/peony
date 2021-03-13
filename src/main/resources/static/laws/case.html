@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <title>案例</title>
     <link href="../css/popup.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!--    ueditor-->
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <script type="text/javascript" charset="utf-8" src="../ueditor/ueditor.config.js"></script>
-    <script type="text/javascript" charset="utf-8" src="../ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="../ueditor/ueditor.all.min.js"></script>
     <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="../ueditor/lang/zh-cn/zh-cn.js"></script>
@@ -24,9 +24,9 @@
         let $popup = new popup();
         let rVue;
         let isShow = false;// 富文本是否已经显示
-        let ue = UE.getEditor('editor',{
-            wordCount:true ,         //是否开启字数统计
-            maximumWords:1000,     //允许的最大字符数
+        let ue = UE.getEditor('editor', {
+            wordCount: true,         //是否开启字数统计
+            maximumWords: 1000,     //允许的最大字符数
             toolbars: [
                 [
                     'undo', //撤销
@@ -59,58 +59,63 @@
                     'preview', //预览
                     'cleardoc', //清空文档
                 ]
-            ]});
+            ]
+        });
         $(function () {
             rVue = new Vue({
                 el: "#content",
                 data: {
-                    law:{legalCases:{}},
-                    remarkType:"REMARK",
-                    content:"",
-                    isAppendTo:false,
+                    law: {legalCases: {}},
+                    remarkType: "REMARK",
+                    content: "",
+                    isAppendTo: false,
                 },
                 filters: {
                     countFilter: function (count) {
-                        if(count>0){
-                            return count+"条";
-                        }else {
+                        if (count > 0) {
+                            return count + "条";
+                        } else {
                             return "暂无数据"
                         }
                     },
                     nameFilter: function (name, maxSize) {
-                        if(name.length > maxSize){
-                            name = name.substring(0,maxSize-1)+"...";
+                        if (name.length > maxSize) {
+                            name = name.substring(0, maxSize - 1) + "...";
                         }
                         return name;
                     },
                     getfullName: function (lawList) {
-                        if(lawList.length >0){
+                        if (lawList.length > 0) {
                             return lawList[0]["fullName"];
                         }
                     },
                     subContent: function (content, maxSize) {
                         maxSize == undefined ? 10 : maxSize;
-                        if(content == undefined){
+                        if (content == undefined) {
                             return "错误数据";
                         }
-                        if(content.length > maxSize){
-                            content = content.substring(0, maxSize)+"...";
+                        if (content.length > maxSize) {
+                            content = content.substring(0, maxSize) + "...";
                         }
                         return content;
                     },
                 },
                 methods: {
+                    showCase: function (id) {
+                        if (id)
+                            window.location.href = "/laws/addCase.html?lawId=" + id;
+                    }
                 }
             });
             console.log("lawId", lawId);
-            $.get("/web/v1/law/getLawById",{"lawId": lawId},function (data) {
+            $.get("/web/v1/law/getLawById", {"lawId": lawId}, function (data) {
                 console.log(data);
                 console.log("JSON.parse", data.content.legalCases);
                 rVue.law = data.content;
                 rVue.law.legalCases = data.content.legalCases;
 
 
-            },"json");
+            }, "json");
             localStorage.removeItem("lawId");
             //必须等待ue创建完成在可以使用
             // ue.ready(function () {
@@ -122,11 +127,11 @@
         /**
          * @return {string}
          */
-        function GetQueryString(name)
-        {
-            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
             var r = window.location.search.substr(1).match(reg);
-            if(r!=null)return  unescape(r[2]); return null;
+            if (r != null) return unescape(r[2]);
+            return null;
         }
 
     </script>
@@ -139,8 +144,8 @@
         </li>
     </ul>
 </nav>
-<div class="container">
-    <div id="content" class="card">
+<div id="content" class="container">
+    <div class="card">
         <div class="card-header text-center">法条显示</div>
         <div id="law-content" class="card-body">
             <input type="hidden" name="id" :value="law.id">
@@ -148,30 +153,43 @@
             <p style="text-indent: 2em;">{{law.content}}</p>
         </div>
         <div class="card-body">
-            <h4 class="card-text">案例:
-                <span class="badge badge-sm badge-success" style="font-size: 12px;font-weight: normal;">{{law.legalCases.agreeCount}}赞</span>
-                <span class="badge badge-sm badge-warning" style="font-size: 12px;font-weight: normal;">{{law.legalCases.dissentCount}}踩</span>
-            </h4>
-            <span class="cardtexttext" v-html="law.legalCases.content"></span>
+            <div v-if="law.legalCases">
+                <h4 class="card-text">案例:
+                    <span class="badge badge-sm badge-success" style="font-size: 12px;font-weight: normal;">{{law.legalCases.agreeCount}}赞</span>
+                    <span class="badge badge-sm badge-warning" style="font-size: 12px;font-weight: normal;">{{law.legalCases.dissentCount}}踩</span>
+                </h4>
+                <span class="card-text" v-html="law.legalCases.content"></span>
+            </div>
+            <div v-else>
+                <div class="card">
+                    <div class="card-body text-center">
+                        <a class="card-text text-secondary" @click="showCase(law.id)">本法条还未有案例, 亟待您的添加!</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header text-center">
-            <a class="card-link" data-toggle="collapse" href="javascript:;" data-target="#collapseOne">评论区</a></div>
-        <div class="card-body show" id="collapseOne">
-            <p class="card-text">评论内容1</p>
-            <p class="card-text">评论内容2</p>
-            <p class="card-text">评论内容3</p>
-            <p class="card-text">评论内容4</p>
+    <div v-if="law.legalCases">
+        <div class="card">
+            <div class="card-header text-center">
+                <a class="card-link" data-toggle="collapse" href="javascript:;" data-target="#collapseOne">评论区</a></div>
+            <div class="card-body show" id="collapseOne">
+                <p class="card-text">评论内容1</p>
+                <p class="card-text">评论内容2</p>
+                <p class="card-text">评论内容3</p>
+                <p class="card-text">评论内容4</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header text-center">评论</div>
+            <div class="card-body">
+                <span class="btn btn-primary submit-remark" onclick="sureSubmit()">提交</span>
+                <script id="editor" type="text/plain" style="width:100%;height:300px;"></script>
+            </div>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header text-center">评论</div>
-        <div class="card-body">
-            <span class="btn btn-primary submit-remark" onclick="sureSubmit()">提交</span>
-            <script id="editor" type="text/plain" style="width:100%;height:300px;"></script>
-        </div>
-    </div>
+
+
 </div>
 </body>
 <script>
@@ -180,30 +198,33 @@
         $(".put-remark").show();
         $(".submit-remark").hide()
         let data = {
-            "content":getContent(),
-            "lawId":rVue.law.id,
+            "content": getContent(),
+            "lawId": rVue.law.id,
         };
         let url = "/web/v1/remark/addRemarkToTemp";
-        $.post(url,data,function (data) {
+        $.post(url, data, function (data) {
             console.log(data);
-            if(data.code == 0){
-               toast("提交成功,请耐心等待审核! 2秒后跳转值首页",2, function () {
-                   window.location.href = "/";
-               })
+            if (data.code == 0) {
+                toast("提交成功,请耐心等待审核! 2秒后跳转值首页", 2, function () {
+                    window.location.href = "/";
+                })
             }
-        },"json")
+        }, "json")
     }
+
     function toast(msg, time, fn) {
         $popup.toast(msg, time);
-        if(fn)
+        if (fn)
             setTimeout(function () {
                 fn();
-            }, time*1000);
+            }, time * 1000);
     }
+
     function deleteEditor() {
-        setContent("",false);
+        setContent("", false);
         $("#editor").hide();
     }
+
     function getContent() {
         return ue.getContent();
     }

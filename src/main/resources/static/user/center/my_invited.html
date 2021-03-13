@@ -5,29 +5,18 @@
     <title>我的邀请</title>
     <link href="../../css/member-style.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../css/popup.css">
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="./../../plugins/jquery/3.3.1/jquery.min.js"></script>
     <script src="../../js/jquery-domResize.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="./../../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./../../plugins/vue/2.2.2/vue.min.js"></script>
     <script type="text/javascript" src="../../js/popup.js"></script>
     <script type="text/javascript" src="../../js/my-vue-tab2.js"></script>
     <script type="text/javascript" src="../../js/format.js"></script>
     <script>
-    function copyMyCode() {
-        parent.toast("已复制验证码, 你可以分享给您的朋友,如果失败请手动复制", 2);
-        var inp =document.createElement('input');
-        $("#copyData").parent().append(inp)
-        $(inp).val($("#copyData").html());
-        inp.select();
-        document.execCommand('copy',false);
-        inp.remove();
-    }
-
-
-    function doInvite() {
+        function doInvite() {
             var data = $("input[name=inviteCode]").val().trim();
             if(!data){
                 parent.toastERR("请输入正确的邀请码格式");
@@ -94,20 +83,6 @@
                     }
                 }
             });
-
-            $("#copyData").bind("copy", function (e) {
-                var cpTxt = "复制的数据";
-                var clipboardData = window.clipboardData; //for IE
-                if (!clipboardData) { // for chrome
-                    clipboardData = e.originalEvent.clipboardData;
-                }
-                var result = clipboardData.getData("text")+":"+cpTxt;
-                //e.clipboardData.getData('text');//可以获取用户选中复制的数据
-                clipboardData.setData('Text', result);
-                $('p').text(result);
-                return false;//否则设不生效
-            });
-
             function getInvitePage(pageNumber) {
                 getInvitedList(pageNumber);
             }
@@ -173,8 +148,7 @@
         <div class="card-body">
             <p class="card-text">
                 <span class="font-weight-bold">我的邀请码:</span>
-                <span class="badge badge-secondary ml-4" id="copyData">{{myCode|inviteCodeFilter}}</span>
-                <button class="btn btn-sm btn-primary ml-2" onclick="copyMyCode()">复制验证码</button> <br>
+                <span class="badge badge-secondary ml-4">{{myCode|inviteCodeFilter}}</span> <br>
             </p>
             <p class="card-text">
                 <div v-if="myInviter">

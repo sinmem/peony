@@ -209,7 +209,7 @@
                                                 </includes>
                                             </resource>
                                         </resources>
-                                        <outputDirectory>${project.build.directory}/static</outputDirectory>
+                                        <outputDirectory>${project.build.directory}/static/slr</outputDirectory>
                                     </configuration>
                                 </execution>
                             </executions>

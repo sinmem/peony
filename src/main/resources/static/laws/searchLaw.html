@@ -4,108 +4,110 @@
     <meta charset="UTF-8">
     <title>搜索</title>
     <link rel="stylesheet" type="text/css" href="../css/popup.css">
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" rel="stylesheet">
-    <script  type="text/javascript" src="../js/popup.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js"></script>
-
+    <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./../plugins/bootstrap/bootstrap-switch.min.css" rel="stylesheet">
+    <script type="text/javascript" src="../js/popup.js"></script>
+    <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
+    <script src="./../js/law-main.js"></script>
     <script>
         function getNewLaw(el) {
             let id = $(el).parents(".list-content").find(".item-checkbox").val();
-            $.get("/web/v1/law/getNewLaw",{thisLawId:id},function (data) {
+            $.get("/web/v1/law/getNewLaw", {thisLawId: id}, function (data) {
                 console.log(data);
-                if(data.code === 0){
+                if (data.code === 0) {
                     $law.laws = data.content;
                     showLawModal();
-                }else {
-                    $popup.toast("获取数据失败"+data.message, 2)
+                } else {
+                    $popup.toast("获取数据失败" + data.message, 2)
                 }
-            },"json").fail(function (err) {
+            }, "json").fail(function (err) {
                 $popup.toast("很抱歉, 服务器开小差啦T_T", 2)
             });
         }
 
         function getOldLaws(el) {
             let id = $(el).parents(".list-content").find(".item-checkbox").val();
-            $.get("/web/v1/law/getOldLaws",{thisLawId:id},function (data) {
-                if(data.code === 0){
+            $.get("/web/v1/law/getOldLaws", {thisLawId: id}, function (data) {
+                if (data.code === 0) {
                     $law.laws = data.content;
-                }else {
-                    $popup.toast("获取数据失败"+data.message, 2)
+                } else {
+                    $popup.toast("获取数据失败" + data.message, 2)
                 }
-            },"json").fail(function (err) {
+            }, "json").fail(function (err) {
                 $popup.toast("很抱歉, 服务器开小差啦T_T", 2)
             });
         }
 
-    var $popup = new popup()
+        var $popup = new popup()
         let lawVue;
         let legalVue;
         let $law;
+
         function toUpdateLaws() {
             let tempLaw = $(".result-content  .item-checkbox:checked").get();
-            if(tempLaw.length<=0){
+            if (tempLaw.length <= 0) {
                 $popup.toast("请先勾选法条", 1);
                 return false;
             }
             showLegalModal(
                 function (data) {
                     console.log(data);
-                    $.post("/web/v1/law/reviseLaws",data,function(data){
-                        if(data.code === 0){
+                    $.post("/web/v1/law/reviseLaws", data, function (data) {
+                        if (data.code === 0) {
                             $popup.toast("修改成功! 请刷新查看");
-                        }else {
+                        } else {
                             console.log(data);
-                            $popup.toast("很抱歉, 操作失败! "+data.message, 2)
+                            $popup.toast("很抱歉, 操作失败! " + data.message, 2)
                         }
-                    },"json").fail(function (err) {
+                    }, "json").fail(function (err) {
                         console.log(err);
                         $popup.toast("很抱歉, 服务器开小差啦T_T", 2)
                     });
-            },
+                },
                 function (data) {
-                    $.post("/web/v1/law/modifyLaws",data,function (data) {
-                        if(data.code === 0){
+                    $.post("/web/v1/law/modifyLaws", data, function (data) {
+                        if (data.code === 0) {
                             $popup.toast("修改成功! 请刷新查看");
-                        }else {
-                            $popup.toast("很抱歉, 操作失败"+data.message, 2)
+                        } else {
+                            $popup.toast("很抱歉, 操作失败" + data.message, 2)
                         }
-                    },"json").fail(function (err) {
+                    }, "json").fail(function (err) {
                         $popup.toast("很抱歉, 服务器开小差啦T_T", 2)
                     });
                 });
 
 
         }
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
             $(".saveCondition").bootstrapSwitch({
-                onColor : "success",
+                onColor: "success",
             }).bootstrapSwitch('state', true);
             lawVue = new Vue({
                 el: "#content",
                 data: {
-                    usr:{},
+                    usr: {},
                     conditionList: [],
-                    fullName:0,
-                    tag:0,
-                    tags:[],
-                    tagIds:[],
-                    showTag:[],
+                    fullName: 0,
+                    tag: 0,
+                    tags: [],
+                    tagIds: [],
+                    showTag: [],
                     page: {},
                     tagList: [],
                     fullNameList: [],
                     lawList: [],
-                    currentType:0,
+                    currentType: 0,
                     conditionType: "法律全称",
                     // 分页信息
                     // 分页查询地址
-                    actionURL:"",
+                    actionURL: "",
                     // 页码
                     pageNum: 1,
                     // 页面大小
@@ -115,9 +117,9 @@
                     // 总条数
                     total: 0,
                     //该标签其他法条分页数据
-                    otherLawPage:{
+                    otherLawPage: {
                         //标签名
-                        tagName:"",
+                        tagName: "",
                         // 页码
                         pageNum: 1,
                         // 页面大小
@@ -127,54 +129,54 @@
                         // 总条数
                         total: 0,
                         //法条列表
-                        laws:[],
+                        laws: [],
                         //查找更多数据所需要的信息
-                        URLData:{},
+                        URLData: {},
                     },
                     //是否多选标签
-                    isCheckMore:false,
+                    isCheckMore: false,
                 },
                 filters: {
                     countFilter: function (count) {
-                        if(count>0){
-                            return count+"条";
-                        }else {
+                        if (count > 0) {
+                            return count + "条";
+                        } else {
                             return "暂无数据"
                         }
                     },
                     nameFilter: function (name, maxSize) {
-                        if(name.length > maxSize){
-                            name = name.substring(0,maxSize-1)+"...";
+                        if (name.length > maxSize) {
+                            name = name.substring(0, maxSize - 1) + "...";
                         }
                         return name;
                     },
                     usrNameFilter: function (name, phone) {
-                        if(name)
-                            if(!(name.trim().length===0))
+                        if (name)
+                            if (!(name.trim().length === 0))
                                 return name.trim();
-                        if(!phone)
+                        if (!phone)
                             return "???";
-                        return "P"+phone.substring(0,3)+"****"+phone.substring(7,11);
+                        return "P" + phone.substring(0, 3) + "****" + phone.substring(7, 11);
                     },
                 },
                 methods: {
-                    toRemark :function(id){
-                        window.location.href = 'remark.html?lawId='+id;
+                    toRemark: function (id) {
+                        window.location.href = 'remark.html?lawId=' + id;
                     }
                 }
             });
             legalVue = new Vue({
-                el:"#LegalModal",
-                data:{
-                    legals:undefined,//这里指向id
+                el: "#LegalModal",
+                data: {
+                    legals: undefined,//这里指向id
                 }
             });
             $law = new Vue({
-                el:"#LawModal",
-                data:{
-                    laws:[{
-                        content:"",
-                        releaseTime:{year:0}
+                el: "#LawModal",
+                data: {
+                    laws: [{
+                        content: "",
+                        releaseTime: {year: 0}
                     }],//这里指向id
                 }
             });
@@ -182,24 +184,26 @@
             getUsr();
 
         });
+
         function getLegals() {
-            $.get("/web/v1/law/getLegals",{},function (data) {
-                if(data.code === 0){
+            $.get("/web/v1/law/getLegals", {}, function (data) {
+                if (data.code === 0) {
                     legalVue.legals = data.content;
-                }else {
+                } else {
                     console.log(data);
-                    $popup.toast("获取法律数据失败",2);
+                    $popup.toast("获取法律数据失败", 2);
                 }
-            },"json").fail(function (err) {
+            }, "json").fail(function (err) {
                 console.log(err);
-                $popup.toast("很抱歉! 服务器开小差啦T_T",2)
+                $popup.toast("很抱歉! 服务器开小差啦T_T", 2)
             })
         }
-        function getUsr(){
-            $.get("/me",{},function (data) {
-                if(data.code === 0){
+
+        function getUsr() {
+            $.get("/me", {}, function (data) {
+                if (data.code === 0) {
                     lawVue.usr = data.content;
-                }else {
+                } else {
                     $popup.toast("很抱歉, 获取用户信息失败! ", 2)
                 }
             }).fail(function (err) {
@@ -208,7 +212,7 @@
         }
     </script>
     <style>
-        #law-list,#legal-tag-list,#legal-name-list{
+        #law-list, #legal-tag-list, #legal-name-list {
             list-style: none;
         }
 
@@ -244,7 +248,7 @@
             width: 30px !important;
         }
 
-        .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-secondar{
+        .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-secondar {
             width: 30px !important;
             border-radius: 11px;
             position: relative;
@@ -253,22 +257,26 @@
             background-color: #aaa;
             border-color: #aaa;
         }
-        .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-secondar:hover{
+
+        .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-secondar:hover {
             background-color: #aaa;
             border-color: #aaa;
         }
-        #saveTheCondition{
+
+        #saveTheCondition {
             font-size: 8px;
             color: #aaa;
             position: relative;
             top: 20px;
             left: -35px;
         }
-        .btn.btn-outline-secondary.ml-auto:hover{
+
+        .btn.btn-outline-secondary.ml-auto:hover {
             background-color: #fff;
             color: #6c757d;
         }
-        .nav-item.btn.btn-outline-info span.fa-close{
+
+        .nav-item.btn.btn-outline-info span.fa-close {
             width: 12px;
             height: 12px;
             size: 3px;
@@ -280,13 +288,16 @@
             padding: 0px;
             display: inline-block;
         }
-        .nav-item.btn.btn-outline-info span.fa-close:hover{
+
+        .nav-item.btn.btn-outline-info span.fa-close:hover {
             color: #dc3545;
         }
-        .law-content{
+
+        .law-content {
             text-indent: 2em;
         }
-        .release-time{
+
+        .release-time {
             color: #6c757d;
             font-size: 10px;
             float: right;
@@ -295,21 +306,25 @@
             right: 8px;
             z-index: -1;
         }
-        .tags fa.fa-tags{
+
+        .tags fa.fa-tags {
             font-size: 8px;
         }
-        .tags span.law-tag-span.btn.btn-outline-info,.tags button.law-tag-button.btn.btn-outline-info{
+
+        .tags span.law-tag-span.btn.btn-outline-info, .tags button.law-tag-button.btn.btn-outline-info {
             font-size: 8px;
             padding: 2px;
             margin: 0px 2px;
         }
-        .fa.fa-angle-double-down:hover{
+
+        .fa.fa-angle-double-down:hover {
             color: #1b1e21;
             font-size: 1.1em;
             cursor: pointer;
         }
+
         /*--------以下编辑于vscode------*/
-        .flex-toolbar{
+        .flex-toolbar {
             position: fixed;
             right: 10px;
             bottom: 100px;
@@ -317,7 +332,8 @@
             font-weight: bold;
             opacity: 0.9;
         }
-        .tagName-box{
+
+        .tagName-box {
             position: fixed;
             right: 44px;
             bottom: 107px;
@@ -325,23 +341,27 @@
             width: 160px;
             display: none;
         }
-        .tagName-box input{
+
+        .tagName-box input {
             height: 38px;
         }
-        .tagName-box span:hover{
+
+        .tagName-box span:hover {
             cursor: pointer;
         }
-        span#name.btn.disabled.btn-sm.btn-outline-primary{
+
+        span#name.btn.disabled.btn-sm.btn-outline-primary {
             min-width: 0px;
             font-size: 14px;
             padding: 2px 3px;
             display: inline;
         }
-        #footer div#morePage .btn{
+
+        #footer div#morePage .btn {
             margin: 10px auto;
         }
 
-        .message-box{
+        .message-box {
             display: none;
             color: #999999;
             font-size: 8px;
@@ -349,55 +369,68 @@
             width: 200px;
             text-align: right;
         }
-        .flex-nav{
+
+        .flex-nav {
             position: fixed;
             width: 100%;
             top: 0px;
         }
-        #fa-spinner{
+
+        #fa-spinner {
             color: #777777;
             font-size: 18px;
         }
-        .lost{
+
+        .lost {
             color: grey;
             cursor: pointer;
         }
-        .hasContent{
+
+        .hasContent {
             color: #000;
             cursor: pointer;
         }
-        tr.list-content.border-bottom.border-secondary.mt-1.pb-1.INVALID{
+
+        tr.list-content.border-bottom.border-secondary.mt-1.pb-1.INVALID {
             color: #AAA;
             background-color: #FEE;
-            font-style:oblique
+            font-style: oblique
         }
-        tr.list-content.border-bottom.border-secondary.mt-1.pb-1.MODIFIED{
+
+        tr.list-content.border-bottom.border-secondary.mt-1.pb-1.MODIFIED {
             background-color: #c0e6fe;
-            font-style:oblique
+            font-style: oblique
+        }
+
+        .pointer {
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 <div id="header"></div>
+
 <div id="content">
-    <div id="serach">
-        <div class="row">
+    <div id="search">
+        <div class="row text-center">
             <div class="col-9">
                 <ul id="search-tool-bar" class="d-inline-flex p-md-3 nav nav-pills" style="min-width: 640px">
                     <li class="p-1 nav-item">
                         <a class="nav-link active" data-toggle="pill" onclick="changeType(1)" href="#sFullName">全称搜索</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link"  data-toggle="pill" onclick="changeType(2)" href="#sContent">关键词搜索</a>
+                        <a class="nav-link" data-toggle="pill" onclick="changeType(2)" href="#sContent">关键词搜索</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link"  data-toggle="pill" onclick="changeType(3)" href="#sTags">标签查找</a>
+                        <a class="nav-link" data-toggle="pill" onclick="changeType(3)" href="#sTags">标签查找</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link"  data-toggle="pill" onclick="window.location.href = 'legalTags.html'" href="#tagList">全部标签</a>
+                        <a class="nav-link" data-toggle="pill" onclick="window.location.href = 'legalTags.html'"
+                           href="#tagList">全部标签</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link"  data-toggle="pill" onclick="window.location.href = '../admin/MangeHome.html'" href="#tagList">管理</a>
+                        <a class="nav-link" data-toggle="pill"
+                           onclick="window.location.href = '../admin/MangeHome.html'" href="#tagList">管理</a>
                     </li>
                     <li id="xxx" title="切换搜索类型时保留搜索关键词">
                         <input type="checkbox" class="saveCondition" name="saveCondition"/>
@@ -414,8 +447,11 @@
             <form class="tab-pane active container form-inline row" id="sFullName" onsubmit="return false;">
                 <span class="ml-5"></span>
                 <div class="input-group col">
-                    <input class="search-input form-control" autofocus name="conditions" placeholder="请输入法律全称,将在法律全称中进行匹配">
-                    <button class="search-btn btn btn-primary input-group-prepend" onclick="sFullName(this.parentElement)"><span class="fa fa-search"></span> 搜索</button>
+                    <input class="search-input form-control" autofocus name="conditions"
+                           placeholder="请输入法律全称,将在法律全称中进行匹配">
+                    <button class="search-btn btn btn-primary input-group-prepend"
+                            onclick="sFullName(this.parentElement)"><span class="fa fa-search"></span> 搜索
+                    </button>
                 </div>
                 <span class="ml-5"></span>
             </form>
@@ -423,7 +459,9 @@
                 <span class="ml-5"></span>
                 <div class="input-group col">
                     <input class="search-input form-control" name="conditions" placeholder="请输入内容关键词,将在法条内容中进行匹配">
-                    <button class="search-btn btn btn-primary" onclick="sContent(this.parentElement)"><span class="fa fa-search"></span> 搜索</button>
+                    <button class="search-btn btn btn-primary" onclick="sContent(this.parentElement)"><span
+                            class="fa fa-search"></span> 搜索
+                    </button>
                 </div>
                 <span class="ml-5"></span>
             </form>
@@ -431,7 +469,9 @@
                 <span class="ml-5"></span>
                 <div class="input-group col">
                     <input class="search-input form-control" name="conditions" placeholder="请输入法条标签,将在法条标签中进行匹配">
-                    <button class="search-btn btn btn-primary" onclick="sTags(this.parentElement)"><span class="fa fa-search"></span> 搜索</button>
+                    <button class="search-btn btn btn-primary" onclick="sTags(this.parentElement)"><span
+                            class="fa fa-search"></span> 搜索
+                    </button>
                 </div>
                 <span class="ml-5"></span>
             </form>
@@ -439,212 +479,159 @@
             </form>
         </div>
     </div>
-    <div id="result-list" class="result-box">
-        <div class="result-bar">
-            <!--            <div class="condition-box" v-if="conditionList.length > 0">-->
-            <nav class="condition-box navbar navbar-expand-sm bg-light" title="切换搜索范围">
-                <div class="dropdown">
-                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-                        {{conditionType}}
+    <div class="container">
+        <div id="result-list" class="result-box">
+            <div class="result-bar">
+                <!--            <div class="condition-box" v-if="conditionList.length > 0">-->
+                <nav class="condition-box navbar navbar-expand-sm bg-light" title="切换搜索范围">
+                    <div class="dropdown">
+                        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+                            {{conditionType}}
+                        </button>
+                        <div class="dropdown-menu">
+                            <h6 class="dropdown-header">搜索范围</h6>
+                            <span class="dropdown-item" onclick="dropdownChangeType(1)">法律全称</span>
+                            <span class="dropdown-item" onclick="dropdownChangeType(2)">法律条文</span>
+                            <span class="dropdown-item" onclick="dropdownChangeType(3)">法条标签</span>
+                        </div>
+                        <b class="caret"></b>
+                    </div>
+                    中搜索:
+                    <ul class="navbar-nav btn-group">
+                        <li class="nav-item  btn btn-outline-info" v-for="conditionItem in conditionList">
+                            <span class="conditionItem">{{conditionItem}}</span>
+                            <span class="fa fa-close " title="删除该关键词"
+                                  onclick="removeThisCondition(this.parentElement)"></span>
+                        </li>
+                    </ul>
+                    <button type="button" class="btn btn-outline-secondary ml-auto" onclick="searchByType()"
+                            title="点击搜索">
+                        <span class="fa fa-search"></span>搜索
                     </button>
-                    <div class="dropdown-menu">
-                        <h6 class="dropdown-header">搜索范围</h6>
-                        <span class="dropdown-item" onclick="dropdownChangeType(1)">法律全称</span>
-                        <span class="dropdown-item" onclick="dropdownChangeType(2)">法律条文</span>
-                        <span class="dropdown-item" onclick="dropdownChangeType(3)">法条标签</span>
+                    <div class="message-box" title="数据查询结果">
+                        <span id="fa-spinner" class="fa fa-spinner fa-pulse"></span><span id="searching">正在查找</span>
+                        <span id="pageInfo">已显示<span id="showTotal">999999</span>项/共<span
+                                id="total">999999</span>项</span>
                     </div>
-                    <b class="caret"></b>
-                </div>中搜索:
-                <ul class="navbar-nav btn-group">
-                    <li class="nav-item  btn btn-outline-info" v-for="conditionItem in conditionList">
-                        <span class="conditionItem">{{conditionItem}}</span>
-                        <span class="fa fa-close " title="删除该关键词" onclick="removeThisCondition(this.parentElement)"></span>
+                </nav>
+            </div>
+            <div class="row">
+
+            </div>
+            <div class="result-content">
+                <ul style="display: none" id="legal-name-list" class="list-group">
+                    <li class="list-head list-group-item disabled">
+                        <div class="content-box">法律名称</div>
                     </li>
+                    <div class="list-content">
+                        <div class="content-box">
+                            <li class="Legal-name list-group-item list-group-item-action"
+                                v-for="(item,index) in fullNameList" onclick="showLawsByFullName(this)">
+                                <input type="hidden" name="fullNameId" :value="item.id">
+                                <span class="pointer">{{index+1}}. {{item.fullName}}</span>
+
+                                <span class="law-content">({{item.count|countFilter}})</span>
+                            </li>
+
+                        </div>
+                    </div>
                 </ul>
-                <button type="button" class="btn btn-outline-secondary ml-auto" onclick="searchByType()" title="点击搜索">
-                    <span class="fa fa-search"></span>搜索
-                </button>
-                <div class="message-box" title="数据查询结果">
-                    <span id="fa-spinner" class="fa fa-spinner fa-pulse"></span><span id="searching">正在查找</span>
-                    <span id="pageInfo">已显示<span id="showTotal">999999</span>项/共<span id="total">999999</span>项</span>
-                </div>
-            </nav>
-        </div>
-        <div class="result-content">
-            <ul style="display: none" id="legal-name-list" class="list-group">
-                <li class="list-head list-group-item disabled">
-                    <div class="content-box">法律名称</div>
-                </li>
-                <div class="list-content">
-                    <div class="content-box">
-                        <li class="Legal-name list-group-item list-group-item-action" v-for="(item,index) in fullNameList" onclick="showLawsByFullName(this)">
-                            <input type="hidden" name="fullNameId" :value="item.id">
-                            {{index+1}}. {{item.fullName}}
-                            <span class="law-content">({{item.count|countFilter}})</span>
-                        </li>
 
-                    </div>
-                </div>
-            </ul>
-
-            <ul style="display: none" id="legal-tag-list" class="list-group">
-                <li class="list-head list-group-item">
-                    <div class="content-box">标签名
-                        <span class="fa fa-circle float-right" v-if="isCheckMore" onclick="lawVue.isCheckMore = !lawVue.isCheckMore">选择多个标签 <a class="btn btn-sm btn-outline-secondary" onclick="getLawsByTags()">查询</a> </span>
-                        <span class="fa fa-circle-o float-right" v-if="!isCheckMore" onclick="lawVue.isCheckMore = !lawVue.isCheckMore">选择多个标签</span>
-                    </div>
-                </li>
-                <div class="list-content">
-                    <div class="content-box">
-                        <li class="Legal-name list-group-item list-group-item-action" v-for="(item,index) in tagList" onclick="showLawsByTag(this)">
-                            <div class="float-left" style="width: 20px" v-show="isCheckMore">
-                                <div>
-                                    <input type="checkbox" name="CheckMoreList">
-                                    <input type="hidden" :value="item.id" name="tagId">
-                                    <input type="hidden" :value="item.count" name="tagCount">
-                                </div>
-                            </div>
-                            <input type="hidden" name="tagId" :value="item.id">
-                            {{index+1}}. {{item.name}}
-                            <span class="law-content">({{item.count|countFilter}})</span>
-                        </li>
-                    </div>
-                </div>
-            </ul>
-
-            <table class="table table-striped table-hover table-responsive-md" style="display: none" id="law-list">
-                <thead>
-                <tr class="thead-light text-md-center">
-                    <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span class="check-box fa fa-square-o"></span></td>
-                    <td></td>
-                    <td>法条内容</td>
-                </tr>
-                </thead>
-                <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in lawList" :class="{INVALID: item.status == 'INVALID',MODIFIED: item.status == 'MODIFIED'}">
-                    <td class="itemCheckbox" title="选择/取消" style="vertical-align: middle;"  onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
-                    <td style="vertical-align: middle;" >{{index+1}}</td>
-                    <td class="content-box">
-                        <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
-                        <h5 class="Legal-name">
-                            <i v-if="item.status == 'INVALID'" title="已失效" data-toggle="tooltip" class="fa fa-power-off text-warning font-weight-bold" onclick="getNewLaw(this)"></i>
-                            <i v-if="item.status == 'MODIFIED'" title="被修改" data-toggle="tooltip" class="fa fa-refresh text-dark font-weight-bold" onclick="getNewLaw(this)"></i>
-                            {{item.fullName}}
-                        </h5>
-                        <p class="law-content mb-1">{{item.content}}</p>
-                        <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
-                        <div class="tags">
-                            <div v-if="item.legalTags.length > 0">
-                                <div class="law-tags-bar" v-if="item.legalTags.length <= 6">
-                                    <span class="fa fa-tags">标签: </span>
-                                    <span class="law-tag-span btn btn-outline-info" disabled v-for="tagItem in item.legalTags" :title="tagItem.name">
-                                        {{tagItem.name|nameFilter(6)}}
-                                    </span>
-                                    <a onclick="showLawTagbox(this)" title="展开标签">
-                                        <span class="fa fa-angle-double-down"></span>
-                                    </a>
-                                </div>
-                                <div class="law-tags-bar" v-else>
-                                    <span class="fa fa-tags">标签: </span>
-                                    <span class="law-tag-span  btn btn-outline-info" disabled v-for="tagIndex in 5" :title="item.legalTags[tagIndex-1].name">
-                                    {{item.legalTags[tagIndex-1].name|nameFilter(6)}}
-                                </span>
-                                    ...
-                                    <a href="#" onclick="showLawTagbox(this)" title="展开标签">
-                                        <span class="fa fa-angle-double-down"></span>
-                                    </a>
-                                </div>
-                                <div class="law-tags-box" style="display: none">
-                                    <span class="fa fa-tags">标签:</span>
-                                    <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
-                                        <span class="fa fa-angle-double-up"></span>
-                                    </a>
-                                    <div class="law-tags-container">
-                                        <a v-for="tagItem in item.legalTags" title="点击以在下方显示该标签全部其他法条" onclick="getThisTagOthers(this)">
-                                            <input type="hidden" :value="tagItem.id" name="tagId">
-                                            <input type="hidden" :value="item.id" name="lawId">
-                                            <button class="law-tag-button btn btn-outline-info">
-                                                <span class="fa fa-tag">{{tagItem.name}}</span>
-                                            </button>
-                                        </a>
+                <ul style="display: none" id="legal-tag-list" class="list-group">
+                    <li class="list-head list-group-item">
+                        <div class="content-box">标签名
+                            <span class="fa fa-circle float-right" v-if="isCheckMore"
+                                  onclick="lawVue.isCheckMore = !lawVue.isCheckMore">选择多个标签 <a
+                                    class="btn btn-sm btn-outline-secondary" onclick="getLawsByTags()">查询</a> </span>
+                            <span class="fa fa-circle-o float-right" v-if="!isCheckMore"
+                                  onclick="lawVue.isCheckMore = !lawVue.isCheckMore">选择多个标签</span>
+                        </div>
+                    </li>
+                    <div class="list-content">
+                        <div class="content-box">
+                            <li class="Legal-name list-group-item list-group-item-action"
+                                v-for="(item,index) in tagList" onclick="showLawsByTag(this)">
+                                <div class="float-left" style="width: 20px" v-show="isCheckMore">
+                                    <div>
+                                        <input type="checkbox" name="CheckMoreList">
+                                        <input type="hidden" :value="item.id" name="tagId">
+                                        <input type="hidden" :value="item.count" name="tagCount">
                                     </div>
                                 </div>
-                            </div>
-                            <div v-else>
-                                <span class="fa fa-tags">暂无标签: </span>
-                            </div>
+                                <input type="hidden" name="tagId" :value="item.id">
+                                <span class="pointer"> {{index+1}}. {{item.name}}</span>
+                                <span class="law-content">({{item.count|countFilter}})</span>
+                            </li>
                         </div>
-                        <div class="Legal-case">
-                            <input type="hidden" name="index" :value="index">
-                            <input type="hidden" name="lawId" :value="item.id">
-                            <div class="case-box" v-if="item.caseCount > 0">
-                                <span class="fa fa-link">案例: </span>
-                                <a title="点击查看" onclick="showCase(this)" href="javascript:;" class="card-link">查看案例</a>
-<!--                                <span class="fa fa-link">案例: </span>-->
-<!--                                <a href="#" onclick="showLawCase(this)" title="展开">-->
-<!--                                    <span class="fa fa-angle-double-down"></span>-->
-<!--                                </a>-->
-<!--                                <a href="#" onclick="hideLawCase(this)" title="隐藏">-->
-<!--                                    <span class="fa fa-angle-double-up" style="display: none"></span>-->
-<!--                                </a>-->
-<!--                                <div class="case-container" style="display: none">-->
-<!--                                    <span onclick="updCase(this)" class="fa fa-pencil"></span>-->
-<!--                                    <a v-if="item.legalCase != null" :href="item.legalCase.url" title="点击查看案例">-->
-<!--                                        <input type="hidden" name="lawId" :value="item.id">-->
-<!--                                        <button class="law-tag-button btn btn-outline-info">-->
-<!--                                            <span class="fa fa-link">{{item.legalCase.name}}</span>-->
-<!--                                        </button>-->
-<!--                                    </a>-->
-<!--                                    <a v-else title="查询中请稍等" disabled>-->
-<!--                                        <button class="law-tag-button btn btn-outline-info">-->
-<!--                                            <span class="fa fa-link">正在查询</span>-->
-<!--                                        </button>-->
-<!--                                    </a>-->
-<!--                                </div>-->
-                            </div>
-                            <span class="case-box lost" v-else>
-                                <span class="fa fa-link">案例: </span>
-                                <a title="点击添加" onclick="addCase(this)">暂无案例</a>
-                            </span>
-                        </div>
-                        <div class="remake" @click="toRemark(item.id)">
-                            <span class="case-box hasContent" v-if="item.remarkCount > 0">
-                                <span class="fa fa-commenting-o">备注: </span>
-                                点击查看
-                            </span>
-                            <span class="case-box lost" v-else>
-                                <span class="fa fa-commenting-o">备注: </span>
-                                <a title="点击添加">暂无备注</a>
-                            </span>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            <div style="display: none" id="ohterTag-laws" class="list-group">
-                <div class="list-head list-group-item">
-                    <!--"其他法条"的分页信息-->
-                    <div class="content-box">获取标签名为: "{{otherLawPage.tagName}}" 的其他标签结果-(共{{otherLawPage.total}}条/已显示
-                        {{(otherLawPage.pageNum < otherLawPage.pages)?otherLawPage.pageNum*otherLawPage.pageSize:otherLawPage.total}}条)
-                        <span id="colse-ohterTag-laws" style="cursor: pointer;" class="fa fa-close float-right" onclick="closeOTL()"></span>
                     </div>
-                </div>
-                <div class="list-content">
-                    <div class="content-box">
-                        <div class="Legal-name list-group-item list-group-item-action" v-for="(item,index) in otherLawPage.laws">
-                            <h5 class="Legal-name">{{item.fullName}}</h5>
+                </ul>
+
+                <table class="table table-striped table-hover table-responsive-md" style="display: none" id="law-list">
+                    <thead>
+                    <tr class="thead-light text-md-center">
+                        <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span
+                                class="check-box fa fa-square-o"></span></td>
+                        <td></td>
+                        <td>法条内容</td>
+                    </tr>
+                    </thead>
+                    <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in lawList"
+                        :class="{INVALID: item.status == 'INVALID',MODIFIED: item.status == 'MODIFIED'}">
+                        <td class="itemCheckbox" title="选择/取消" style="vertical-align: middle;"
+                            onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
+                        <td style="vertical-align: middle;">{{index+1}}</td>
+                        <td class="content-box">
+                            <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
+                            <h5 class="Legal-name">
+                                <i v-if="item.status == 'INVALID'" title="已失效" data-toggle="tooltip"
+                                   class="fa fa-power-off text-warning font-weight-bold" onclick="getNewLaw(this)"></i>
+                                <i v-if="item.status == 'MODIFIED'" title="被修改" data-toggle="tooltip"
+                                   class="fa fa-refresh text-dark font-weight-bold" onclick="getNewLaw(this)"></i>
+                                {{item.fullName}}
+                            </h5>
                             <p class="law-content mb-1">{{item.content}}</p>
                             <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
+                            <div class="mr-lg-1">
+                                <div class="">
+                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-newspaper-o" @click="toRemark(item.id)">法条全景</span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-object-group">法条解读</span></button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="display: none" id="ohterTag-laws" class="list-group">
+                    <div class="list-head list-group-item">
+                        <!--"其他法条"的分页信息-->
+                        <div class="content-box">获取标签名为: "{{otherLawPage.tagName}}"
+                            的其他标签结果-(共{{otherLawPage.total}}条/已显示
+                            {{(otherLawPage.pageNum <
+                            otherLawPage.pages)?otherLawPage.pageNum*otherLawPage.pageSize:otherLawPage.total}}条)
+                            <span id="colse-ohterTag-laws" style="cursor: pointer;" class="fa fa-close float-right"
+                                  onclick="closeOTL()"></span>
                         </div>
                     </div>
+                    <div class="list-content">
+                        <div class="content-box">
+                            <div class="Legal-name list-group-item list-group-item-action"
+                                 v-for="(item,index) in otherLawPage.laws">
+                                <h5 class="Legal-name">{{item.fullName}}</h5>
+                                <p class="law-content mb-1">{{item.content}}</p>
+                                <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="otherLawPage.pageNum < otherLawPage.pages" class="text-center" style="cursor: pointer;">
+                        <span class="btn btn-info btn-small btn-sm center-align" onclick="getMoreOTagL()">加载更多</span>
+                    </div>
+                    <div v-else class="text-center">
+                        <span class="btn btn-outline-info btn-sm btn-small center-align disabled">没有更多了</span>
+                    </div>
                 </div>
-                <div v-if="otherLawPage.pageNum < otherLawPage.pages" class="text-center" style="cursor: pointer;">
-                    <span class="btn btn-info btn-small btn-sm center-align" onclick="getMoreOTagL()">加载更多</span>
-                </div>
-                <div v-else class="text-center">
-                    <span class="btn btn-outline-info btn-sm btn-small center-align disabled">没有更多了</span>
-                </div>
-            </div>
 
+            </div>
         </div>
     </div>
 </div>
@@ -667,7 +654,7 @@
         <input class="" name="tagName" type="text" placeholder="请输入标签名">
         <div class="input-group-append">
             <button class="btn bg-primary" style="width: 77px;" title="添加" onclick="addTag(this)">添加</button>
-            <button class="btn bg-secondary"style="width: 77px;"  title="取消" onclick="cancelTag(this)">取消</button>
+            <button class="btn bg-secondary" style="width: 77px;" title="取消" onclick="cancelTag(this)">取消</button>
         </div>
     </div>
 </div>
@@ -699,30 +686,32 @@
                             <div class="form-group">
                                 <label for="releaseTime">发布时间:</label>
                                 <div class=" input-group">
-                                    <input  class="form-control" id="releaseTime" rows="5" placeholder="请输发布时间"/>
+                                    <input class="form-control" id="releaseTime" rows="5" placeholder="请输发布时间"/>
                                     <div class="input-group-append">
                                         <span class="input-group-text">年</span>
                                     </div>
                                 </div>
                             </div>
-                        </div><div class="card-body">
-                        <div class="form-group">
-                            <label for="legalNo">法条编号:</label>
-                            <div class=" input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">第</span>
-                                </div>
-                                <input  class="form-control" id="legalNo" rows="5" placeholder="请输法条编号"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">条</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="legalNo">法条编号:</label>
+                                <div class=" input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">第</span>
+                                    </div>
+                                    <input class="form-control" id="legalNo" rows="5" placeholder="请输法条编号"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">条</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>legalNo
-                    </div>
+                            legalNo
+                        </div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="LawContent">法条正文:</label>
-                                <textarea  class="form-control" id="LawContent" rows="5" placeholder="请输入内容"></textarea>
+                                <textarea class="form-control" id="LawContent" rows="5" placeholder="请输入内容"></textarea>
                             </div>
                         </div>
                     </form>
@@ -842,33 +831,34 @@
         conditions = [],// 条件列表
         byTypeFlage = false;//导航栏搜索按钮识别
     conditionType = {
-        1:"法律全称",
-        2:"法律条文",
-        3:"法条标签",
+        1: "法律全称",
+        2: "法律条文",
+        3: "法条标签",
     };
-    function sTags(el){
+
+    function sTags(el) {
         let curretnValue = $(el).find("input[name=conditions]").val().trim();
-        if(!checkInput(curretnValue, 3))
+        if (!checkInput(curretnValue, 3))
             return;
         addcondition(curretnValue);
         lawVue.actionURL = "/web/v1/tag/searchTags";
         lawVue.currentType = 3;
         showSearch();
         $.get(lawVue.actionURL,
-            {"conditions":conditions.toString()},
+            {"conditions": conditions.toString()},
             function (data) {
                 oldValue = curretnValue;
                 // 60秒后删除旧值
                 setTimeout(function () {
                     oldValue = "";
-                },60000);
+                }, 60000);
                 // 该条件已被查询, 不能继续搜索
                 byTypeFlage = true;
                 setTimeout(function () {
                     byTypeFlage = false;
-                },60000)
+                }, 60000)
                 oldType = 3;
-                if(data.code == 0){
+                if (data.code == 0) {
                     showTags(data.content.pageContent);
                     setpageInfo(data.content)
                 }
@@ -878,29 +868,29 @@
         )
     }
 
-    function sContent(el){
+    function sContent(el) {
         let curretnValue = $(el).find("input[name=conditions]").val().trim();
-        if(!checkInput(curretnValue, 2))
+        if (!checkInput(curretnValue, 2))
             return;
         addcondition(curretnValue);
         lawVue.actionURL = "/web/v1/law/search/onContent"
         lawVue.currentType = 2;
         showSearch();
         $.get(lawVue.actionURL,
-            {"conditions":conditions.toString()},
+            {"conditions": conditions.toString()},
             function (data) {
                 oldValue = curretnValue;
                 // 60秒后删除旧值
                 setTimeout(function () {
                     oldValue = "";
-                },60000);
+                }, 60000);
                 // 该条件已被查询, 不能继续搜索
                 byTypeFlage = true;
                 setTimeout(function () {
                     byTypeFlage = false;
-                },60000)
+                }, 60000)
                 oldType = 2;
-                if(data.code == 0){
+                if (data.code == 0) {
                     showLaws(data.content.pageContent);
                     setpageInfo(data.content)
                 }
@@ -912,27 +902,27 @@
 
     function sFullName(el) {
         let curretnValue = $(el).find("input[name=conditions]").val().trim();
-        if(!checkInput(curretnValue, 1))
+        if (!checkInput(curretnValue, 1))
             return;
         addcondition(curretnValue);
         lawVue.actionURL = "/web/v1/law/searchFullName";
         lawVue.currentType = 1;
         showSearch();
         $.get(lawVue.actionURL,
-            {"conditions":conditions.toString()},
+            {"conditions": conditions.toString()},
             function (data) {
                 oldValue = curretnValue;
                 // 60秒后删除旧值
                 setTimeout(function () {
                     oldValue = "";
-                },60000);
+                }, 60000);
                 // 该条件已被查询, 不能继续搜索
                 byTypeFlage = true;
                 setTimeout(function () {
                     byTypeFlage = false;
-                },60000)
+                }, 60000)
                 oldType = 1;
-                if(data.code == 0){
+                if (data.code == 0) {
                     showFullName(data.content.pageContent);
                     setpageInfo(data.content)
                 }
@@ -949,17 +939,17 @@
      * @returns {boolean}
      */
     function checkInput(curretnValue, type) {
-        if(curretnValue == ""){
+        if (curretnValue == "") {
             alert("为空");
             return false;
-        }else if(curretnValue == oldValue && oldType == type){
+        } else if (curretnValue == oldValue && oldType == type) {
             alert("频繁重复提交! 请1分钟后重试")
             return false;
-        }else{
+        } else {
             // 60秒后删除旧值
             setTimeout(function () {
                 oldValue = "";
-            },60000);
+            }, 60000);
             lawVue.conditionList = conditions;
             // 有新条件检测通过, 搜索栏可以点击搜索
             byTypeFlage = false;
@@ -978,8 +968,8 @@
      */
     function removeCondition(condition) {
         let foundAt = find(condition);
-        if( foundAt > -1 ){
-            conditions.splice( foundAt , 1 );
+        if (foundAt > -1) {
+            conditions.splice(foundAt, 1);
             return true;
         }
         return false;
@@ -1004,8 +994,8 @@
         if (conditions.length == 0)
             return -1;
         for (let i = 0; i < conditions.length; i++) {
-            if (conditions[i] == element){
-                return  i;
+            if (conditions[i] == element) {
+                return i;
             }
         }
         return -1;
@@ -1024,20 +1014,20 @@
      */
     function showResultbox(type) {
         let isSaveCondition = $(".saveCondition").bootstrapSwitch('state');
-        if(!isSaveCondition){
+        if (!isSaveCondition) {
             clearConditions();
             lawVue.conditionList = [];
         }
     }
 
     function changeType(type) {
-        if(currentType == type)
+        if (currentType == type)
             return;
         currentType = type;
-        if(type == 4){
+        if (type == 4) {
             $(".condition-box").hide();
             return;
-        }else
+        } else
             $(".condition-box").show(20);
         // 搜索条件修改, 搜索栏可以点击搜索
         byTypeFlage = false;
@@ -1045,9 +1035,11 @@
         lawVue.conditionType = conditionType[type];
         showResultbox(type);
     }
+
     function dropdownChangeType(type) {
-        $($(".nav-link").get(type-1)).click();
+        $($(".nav-link").get(type - 1)).click();
     }
+
     function removeThisCondition(element) {
         let conditionItem = $(element).find(".conditionItem").html().trim();
         oldValue = "";
@@ -1058,26 +1050,26 @@
     }
 
     function searchByType() {
-        if(conditions.length < 1){
+        if (conditions.length < 1) {
             alert("为空");
             return;
         }
-        if(byTypeFlage){
+        if (byTypeFlage) {
             alert("频繁重复提交! 请1分钟后重试");
             return;
         }
         byTypeFlage = true;
         setTimeout(function () {
             byTypeFlage = false;
-        },60000)
+        }, 60000)
         showSearch();
-        if(currentType == 1){
+        if (currentType == 1) {
             lawVue.actionURL = "/web/v1/law/searchFullName"
             lawVue.currentType = 1;
             $.get(lawVue.actionURL,
-                {"conditions":conditions.toString()},
+                {"conditions": conditions.toString()},
                 function (data) {
-                    if(data.code == 0){
+                    if (data.code == 0) {
                         showFullName(data.content.pageContent);
                         setpageInfo(data.content)
                     }
@@ -1085,13 +1077,13 @@
                 },
                 "json"
             )
-        }else if(currentType == 2){
+        } else if (currentType == 2) {
             lawVue.actionURL = "/web/v1/law/search/onContent";
             lawVue.currentType = 2;
             $.get(lawVue.actionURL,
-                {"conditions":conditions.toString()},
+                {"conditions": conditions.toString()},
                 function (data) {
-                    if(data.code == 0){
+                    if (data.code == 0) {
                         showLaws(data.content.pageContent);
                         setpageInfo(data.content)
                     }
@@ -1099,13 +1091,13 @@
                 },
                 "json"
             )
-        }else if(currentType == 3){
+        } else if (currentType == 3) {
             lawVue.actionURL = "/web/v1/tag/searchTags";
             lawVue.currentType = 3;
             $.get(lawVue.actionURL,
-                {"conditions":conditions.toString()},
+                {"conditions": conditions.toString()},
                 function (data) {
-                    if(data.code == 0){
+                    if (data.code == 0) {
                         showTags(data.content.pageContent);
                         setpageInfo(data.content)
                     }
@@ -1137,6 +1129,7 @@
         $("#legal-tag-list").hide();
         lawVue.fullNameList = data;
     }
+
     /**
      * 根据数据显示法条查询结果
      * @param data
@@ -1145,12 +1138,13 @@
         $("#law-list").show();
         $("#legal-name-list").hide();
         $("#legal-tag-list").hide();
-        if(isAppend){
+        if (isAppend) {
             lawVue.lawList = lawVue.lawList.concat(data);
-        }else {
+        } else {
             lawVue.lawList = data;
         }
     }
+
     function showLawsByFullName(el) {
         let fullName = $(el).find("input[name=fullNameId]").val();
         // console.log(fullName)
@@ -1159,7 +1153,7 @@
         lawVue.currentType = 2;
         showSearch();
         $.get(lawVue.actionURL,
-            {"fullName":fullName},
+            {"fullName": fullName},
             function (data) {
                 showLaws(data.content.pageContent);
                 setpageInfo(data.content)
@@ -1167,8 +1161,9 @@
             "json"
         )
     }
+
     function showLawsByTag(el) {
-        if(lawVue.isCheckMore){
+        if (lawVue.isCheckMore) {
             return;
         }
         let tag = $(el).find("input[name=tagId]").val();
@@ -1179,7 +1174,7 @@
         lawVue.showTag = [tag];
         showSearch();
         $.get(lawVue.actionURL,
-            {"tag":tag},
+            {"tag": tag},
             function (data) {
                 showLaws(data.content.pageContent);
                 setpageInfo(data.content)
@@ -1201,22 +1196,22 @@
             "showTag": lawVue.showTag.toString(),
         };
         lawVue.otherLawPage.URLData = data;
-        $.get("/web/v1/law/getThisTagOthers",data,function (data) {
-            if (data.code === 10002){
+        $.get("/web/v1/law/getThisTagOthers", data, function (data) {
+            if (data.code === 10002) {
                 showLogModal("页面提示-非法获取方式", "禁止获取已通过法条标签查找显示的法条!");
-            }else if(data.code === 0){
-                if(data.content.pageContent.length > 0){
+            } else if (data.code === 0) {
+                if (data.content.pageContent.length > 0) {
                     lawVue.otherLawPage.tagName = $(el).find("button span").html();
                     insertLaws(data.content, false);
                     //需要延时到vue渲染完毕才显示
                     setTimeout(function () {
                         createOhterTagLawsBox(el);
                     }, 10);
-                }else {
+                } else {
                     showLogModal("页面提示-发条获取", "对应标签暂无其他法条可以获取")
                 }
             }
-        },"json");
+        }, "json");
     }
 
     function createOhterTagLawsBox(el) {
@@ -1236,9 +1231,9 @@
         lawVue.otherLawPage.pages = lawPage.pages;
         lawVue.otherLawPage.pageSize = lawPage.pageSize;
         lawVue.otherLawPage.pageNum = lawPage.pageNum;
-        if(isAppend){
+        if (isAppend) {
             lawVue.otherLawPage.laws = lawVue.otherLawPage.laws.concat(lawPage.pageContent);
-        }else {
+        } else {
             lawVue.otherLawPage.laws = lawPage.pageContent;
         }
 
@@ -1251,372 +1246,27 @@
         console.log("ss");
         $("#ohterTag-laws").hide();
     }
+
     function getMoreOTagL() {
-        lawVue.otherLawPage.URLData["pageNum"] = lawVue.otherLawPage.pageNum +1;
-        $.get("/web/v1/law/getThisTagOthers",lawVue.otherLawPage.URLData,function (data) {
-            if (data.code === 10002){
+        lawVue.otherLawPage.URLData["pageNum"] = lawVue.otherLawPage.pageNum + 1;
+        $.get("/web/v1/law/getThisTagOthers", lawVue.otherLawPage.URLData, function (data) {
+            if (data.code === 10002) {
                 showLogModal("页面提示-非法获取方式", "禁止获取已通过法条标签查找显示的法条!");
-            }else if(data.code === 0){
-                if(data.content.pageContent.length > 0){
+            } else if (data.code === 0) {
+                if (data.content.pageContent.length > 0) {
                     insertLaws(data.content, true);
-                }else {
+                } else {
                     showLogModal("页面提示-发条获取", "对应标签暂无其他法条可以获取")
                 }
             }
-        },"json");
+        }, "json");
     }
 </script>
 <script>
-    // --------以下编辑于vscode-------
-    /**
-     * 根据数据错误
-     * @param data
-     */
-    function showError(data) {
-        showLogModal("添加标签失败", data.message)
-    }
-    function showSussess(data) {
-        showLogModal("添加标签成功",data.message)
-    }
-    function cancelTag(el) {
-        $(el).parent().parent().find("input").val('')
-        $(".tagName-box").hide(500);
-    }
 
-    function addTag(el) {
-        $("#DialogModal input[name=name]").addClass("btn btn-outline-primary")
-        let name = $(el).parent().parent().find("input").val();
-        showDialogModal("标签提交确认","将为选中法条添加此标签: ",name, function(){
-            let tempLaw = $(".result-content  .item-checkbox:checked").get();
-            let lawIds = [];
-            tempLaw.forEach(function(item, index){
-                lawIds.push($(item).val().trim());
-            })
-
-            let data = {
-                "tagName":name,
-                "lawIds":lawIds.toString()
-            }
-            console.log(data)
-            // 这里不是分页查询的地址所以不能付给lawVue.actionURL
-            $.post("/web/v1/tag/mange/addLawTag",data, function(data){
-                cancelTag(el);
-                let status = data.code;
-                if(status == 0){
-                    showSussess(data)
-                }else {
-                    showError(data)
-                }
-                console.log(data)
-            },"json")
-        });
-    }
-
-    function addCase(el) {
-        window.location.href = "/laws/addCase.html?lawId="+$(el).parent().prevAll("input[name=lawId]").val();
-        // showCaseModal(el, "添加案例","/web/v1/case/addCase");
-    }
-
-    function showCase(el) {
-        window.location.href = "/laws/case.html?lawId="+$(el).parent().prevAll("input[name=lawId]").val();
-    }
-
-    function updCase(el) {
-        showCaseModal(el, "修改案例","/web/v1/case/updCase/");
-    }
-
-    function showLawModal(){
-        $("#LawModal").modal("show");
-        $("#LawModal .modal-title").html("法条");
-    }
-
-    function showLegalModal(fn1,fn2){
-        $("#LegalModal").modal("show");
-        $("#LegalModal .modal-title").html("法条修改");
-        let btnOver = $("#LegalModal .btnOver");
-        let btnUpd = $("#LegalModal .btnUpd");
-        // 要取消模态框中确认按钮先前绑定的事件
-        btnOver.unbind("click")
-        btnOver.bind('click', function () {
-            let data = getData();
-            if(!data){
-                return;
-            }
-            fn1(data);
-            $("#LegalModal").modal("hide");
-        });
-        btnUpd.unbind("click")
-        btnUpd.bind('click', function () {
-            let data = getData();
-            if(!data){
-                return;
-            }
-            fn2(data);
-            $("#LegalModal").modal("hide");
-        });
-    }
-
-    function getData() {
-        let tempLaw = $(".result-content  .item-checkbox:checked").get();
-        if(tempLaw.length<=0){
-            $("#LegalModal").modal("hide");
-            $popup.toast("请先勾选法条", 1);
-            setTimeout(function () {
-                $("#LegalModal").modal("show");
-            },1000)
-            return false;
-        }
-        let lawIds = [];
-        tempLaw.forEach(function(item, index){
-            lawIds.push($(item).val().trim());
-        });
-        let data = {
-            oldLaws:lawIds.toString(),
-            content:$("#LegalModal #LawContent").val().trim(),
-            legalId:$("#LegalModal #legalName").val(),
-            releaseTime:Number($("#LegalModal #releaseTime").val()),
-            no:$("#LegalModal #legalNo").val().trim()
-        }
-        if(isNaN(data.releaseTime)||data.releaseTime<2000){
-            $("#LegalModal").modal("hide");
-            $popup.toast("请输入正确发布时间", 1);
-            setTimeout(function () {
-                $("#LegalModal").modal("show");
-            },1000)
-            return false;
-        }
-        if(data.content.length<=0){
-            $("#LegalModal").modal("hide");
-            $popup.toast("请输入正文内容", 1);
-            setTimeout(function () {
-                $("#LegalModal").modal("show");
-            },1000)
-            return false;
-        }
-        return data;
-    }
-    /**
-     * @param el 被选中的元素
-     * @param title 标题
-     * @param action 目标地址
-     */
-    function showCaseModal(el, title, action) {
-        $("#CaseModal").modal("show");
-        $("#CaseModal .modal-title").html(title);
-        let btn = $("#CaseModal .btnSure");
-        // 要取消模态框中确认按钮先前绑定的事件
-        btn.unbind("click")
-        btn.bind('click', function () {
-            let legalCase = $("#legalCase").val(),
-                caseURL = $("#url").val();
-            $("#legalCase").val("");
-            $("#url").val("");
-            let data = {
-                "name": legalCase,
-                "url": caseURL,
-                "lawId": $(el).parent().prevAll("input[name=lawId]").val()
-            };
-            // console.log($(el).parent().prev().get())
-            // console.log(data)
-            showDialogModal("案例提交确认", "案例: ", legalCase+":("+caseURL+")", function () {
-                $.post(action, data, function (data) {
-                    showLogModal("页面提示", title+"成功")
-                    console.log(data);
-                }, "json")
-            })
-            $("#CaseModal").modal("hide");
-        })
-
-    }
-
-    /**
-     *
-     * @param title 标题
-     * @param label 抬头
-     * @param content 内容
-     * @param callback 回调函数
-     */
-    function showDialogModal(title, label, content, callback) {
-        $("#DialogModal .modal-title span").html(title);
-        $("#DialogModal .modal-body label").html(label);
-        $("#DialogModal .modal-body span#name").html(content);
-        $("#DialogModal").modal("show");
-        let btn = $("#DialogModal .btnSure");
-        // 要取消模态框中确认按钮先前绑定的事件
-        btn.unbind("click")
-        btn.bind('click', function () {
-            content = $("#DialogModal input[name=name]").val();
-            callback.call(this, content);
-            $("#DialogModal").modal("hide");
-        })
-    }
-
-    function showLogModal(title, msg) {
-        $("#logModal .modal-title").html(title);
-        $("#logModal .modal-body").html(msg);
-        $("#logModal").modal("show");
-
-    }
-
-    $(function(){
-        let dialog=$("#DialogModal .modal-dialog");
-        //修改窗口宽度
-        dialog.css("width","500px");
-        valign(dialog,0);
-        dialog=$("#logModal .modal-dialog");
-        //修改窗口宽度
-        dialog.css("width","500px");
-        valign(dialog,0);
-        dialog=$("#CaseModal .modal-dialog");
-        dialog.css("width","500px");
-        valign(dialog,0);
-
-        dialog=$("#LawModal .modal-dialog");
-        dialog.css("width","500px");
-        valign(dialog,200);
-
-    })
-    /**
-     * 模态框水平居中
-     * @param {Object} dialog 那个模态框
-     * @param {Number} revised 高度调整修正值(向上为正)
-     */
-    function valign(dialog, revised){
-        revised = Number.parseInt(revised);
-        //获得浏览器视口高度
-        var height=$(window).height();
-        //设置窗口居中
-        dialog.css("margin-top",(height-200-revised)/2+"px")
-    }
-
-    let checkAllFlage = false;
-    function chooseAll(){
-        if(checkAllFlage){
-            checkAllFlage = false;
-            $(".result-content  .item-checkbox").prop("checked", false);
-            $(".result-content .chooseAll span").removeClass("fa-check-square").addClass("fa-square-o");
-        }else{
-            checkAllFlage = true;
-            $(".result-content  .item-checkbox").prop("checked", true);
-            $(".result-content .chooseAll span").removeClass("fa-square-o").addClass("fa-check-square");
-        }
-        changeCheckboxType();
-    }
-    function checkedThis(element,event){
-        $(element).parent().find(".item-checkbox").click()
-        changeCheckboxType();
-    }
-    function changeCheckboxType(){
-        $(".result-content  .item-checkbox").parent().parent().find(".itemCheckbox span").removeClass("fa-check-square").addClass("fa-square-o");
-        $(".result-content  .item-checkbox:checked").parent().parent().find(".itemCheckbox span").removeClass("fa-square-o").addClass("fa-check-square");
-        if($(".result-content  .item-checkbox:checked").get().length <= 0){
-            checkAllFlage = false;
-            $(".result-content .chooseAll span").removeClass("fa-check-square").addClass("fa-square-o");
-        }
-    }
-    function addTagInpu(){
-        let tagList = $(".result-content  .item-checkbox:checked");
-        if(tagList.get().length>0){
-            $(".tagName-box").show(500);
-            let lawIds = tagList.serialize();
-        }else{
-            alert("请先选择法条")
-        }
-    }
-
-    function getMore() {
-        console.log("getMore")
-        let data = {
-            "conditions":lawVue.conditionList.toString(),
-            "pageNum": lawVue.pageNum = lawVue.pageNum >= lawVue.total? lawVue.total: ++lawVue.pageNum,
-            "pageSize": lawVue.pageSize,
-            "fullName":lawVue.fullName,
-            "tagIds":lawVue.tagIds,
-            "tag":lawVue.tag,
-            "tags": JSON.stringify(lawVue.tags)
-        };
-        console.log(data)
-        showSearch();
-        $.get(lawVue.actionURL, data, function (data) {
-            console.log("currentType: "+ lawVue.currentType);
-            console.log("actionURL: "+ lawVue.actionURL);
-            if(lawVue.currentType == 0){
-                return;
-            }else if(lawVue.currentType === 1){
-                data.content.pageContent.forEach(function (item) {
-                    lawVue.fullNameList.push(item)
-                })
-            }else if(lawVue.currentType === 2){
-                data.content.pageContent.forEach(function (item) {
-                    lawVue.lawList.push(item)
-                })
-            }else if(lawVue.currentType === 3){
-                data.content.pageContent.forEach(function (item) {
-                    lawVue.tagList.push(item)
-                })
-            }else if(lawVue.currentType === 4){
-                let arr = data.content;
-                arr.forEach(function (item, index) {
-                    showLaws(item.laws, true);
-                })
-            }
-            // console.log(data.content.pageContent)
-            setpageInfo(data.content)
-            // console.log(lawVue.lawList)
-        },"json")
-    }
-    function setpageInfo(data) {
-        // console.log("setpageInfo-start")
-        // console.log(data)
-        $("#footer div#morePage").show()
-        lawVue.pageNum = data.pageNum;
-        lawVue.pageSize = data.pageSize;
-        lawVue.pages = data.pages;
-        lawVue.total = data.total;
-        console.log(lawVue.pages +" : "+ data.pageNum);
-        if(lawVue.pages > 0 && data.pageNum > 0){
-            $("#footer #morePage").html("<span class='btn btn-outline-secondary btn-small disabled' disabled>没有更多了</span>")
-        }
-        if(lawVue.pages == data.pageNum){
-            $("#footer #morePage").html("<span class='btn btn-outline-secondary btn-small disabled' disabled>没有更多了</span>")
-        }else if(lawVue.pages > data.pageNum){
-            $("#footer #morePage").html("<span class='btn btn-primary btn-small' onclick='getMore()'>加载更多</span>")
-        }
-        // console.log("setpageInfo-end")
-        showPageInfo();
-
-    }
 </script>
 <script>
-    function showLawTagbox(element) {
-        $(element).parent().parent().find(".law-tags-box").show(450);
-        $(element).parent().parent().find(".law-tags-bar").hide(500);
-    }
-    function showLawTagbar(element) {
-        $(element).parent().parent().find(".law-tags-box").hide(485);
-        $(element).parent().parent().find(".law-tags-bar").show(500);
-    }
-    function showLawCase(element) {
-        let lawId = $(element).parent().prevAll("input[name=lawId]").val(),
-            index = $(element).parent().prevAll("input[name=index]").val();
-        console.log("lawId1: "+$(element).parent().prevAll("input[name=lawId]").val())
-        console.log("index: "+index)
-        $.get("/web/v1/case/getCase",{"lawId":lawId},function(data){
-            let legalCase = data.content;
-            console.log(data)
-            data = lawVue.lawList[index];
-            data["legalCase"] = legalCase;
-            lawVue.lawList.splice(index,1,data);
-        },"json")
-        $(element).parent().find(".case-container").show(500);
-        $(element).parent().find(".fa.fa-angle-double-up").show();
-        $(element).parent().find(".fa.fa-angle-double-down").hide();
-    }
-    function hideLawCase(element) {
-        $(element).parent().find(".case-container").hide(500);
-        $(element).parent().find(".fa-angle-double-down").show();
-        $(element).parent().find(".fa-angle-double-up").hide();
-    }
+
 </script>
 <script>
     function getLawsByTags() {
@@ -1626,16 +1276,16 @@
         let total = 0;
         tagsArry.forEach(function (item, index) {
             tags.push({
-                "id":$(item).parent().find("input[name=tagId]").val(),
-                "count":$(item).parent().find("input[name=tagCount]").val(),
+                "id": $(item).parent().find("input[name=tagId]").val(),
+                "count": $(item).parent().find("input[name=tagCount]").val(),
             });
             tag.push($(item).parent().find("input[name=tagId]").val());
             total = total + Number($(item).parent().find("input[name=tagCount]").val());
         })
-        console.log("total: "+ total);
+        console.log("total: " + total);
         lawVue.actionURL = "/web/v1/law/getLawsByTags";
         let data = {
-            "tags":JSON.stringify(tags)
+            "tags": JSON.stringify(tags)
         }
         lawVue.tags = tags;
         console.log(JSON.stringify(data));
@@ -1645,9 +1295,9 @@
             // lawVue.tag = tag;
             let arr = data.content;
             arr.forEach(function (item, index) {
-                if (index == 0){
+                if (index == 0) {
                     showLaws(item.laws);
-                }else {
+                } else {
                     showLaws(item.laws, true);
                 }
             })
@@ -1655,24 +1305,28 @@
             data["pageNum"] = 1
             data["pageSize"] = 20;
             data["total"] = total;
-            data["pages"] = Math.ceil(total/data["pageSize"]) ;
+            data["pages"] = Math.ceil(total / data["pageSize"]);
             setpageInfo(data)
         }, "json")
     }
+
     /*浮动导航栏--及其工具修正*/
     function hideSpinner() {
         $("#fa-spinner").hide();
     }
+
     function showSpinner() {
         $("#fa-spinner").show();
     }
+
     function showSearch(data) {
         $(".message-box").show();
         $("#searching").show();
         showSpinner();
         $("#pageInfo").hide();
     }
-    function showPageInfo(data){
+
+    function showPageInfo(data) {
         $("#searching").hide();
         $("#pageInfo").show();
         hideSpinner();
@@ -1687,10 +1341,10 @@
     // Ok
     $(document).scroll(function () {
         let reHeight = 54; // 高度修正值
-        let result_content_offset = $(".result-content").offset().top-$(window).scrollTop()-reHeight;
-        if(result_content_offset <= 0){
+        let result_content_offset = $(".result-content").offset().top - $(window).scrollTop() - reHeight;
+        if (result_content_offset <= 0) {
             $(".result-bar").addClass("flex-nav");
-        }else if(result_content_offset > 0){
+        } else if (result_content_offset > 0) {
             $(".result-bar").removeClass("flex-nav");
         }
     })
