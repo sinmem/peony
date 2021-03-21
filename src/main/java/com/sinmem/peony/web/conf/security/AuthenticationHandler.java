@@ -3,6 +3,8 @@ package com.sinmem.peony.web.conf.security;
 import com.sinmem.peony.common.Result;
 import com.sinmem.peony.common.enums.Msg;
 import com.sinmem.peony.common.utils.ServletUtils;
+import com.sinmem.peony.dao.bean.User;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -76,7 +78,14 @@ public class AuthenticationHandler implements AuthenticationEntryPoint, AccessDe
 //            response.getWriter().flush();
 //        }
 //        Object object = authentication.getPrincipal();
-        ServletUtils.responseJson(response, Result.success("登陆成功"));
+        if(authentication.getPrincipal() instanceof User){
+            User result = new User();
+            BeanUtils.copyProperties(authentication.getPrincipal(), result);
+            result.setPassword(null);
+            ServletUtils.responseJson(response, Result.success(result));
+        }else {
+            ServletUtils.responseJson(response, Result.success("登录成功"));
+        }
     }
 
     // 登出成功

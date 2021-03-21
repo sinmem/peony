@@ -1,4 +1,8 @@
 
+//<editor-fold desc="Description">
+
+//</editor-fold>
+
 //<editor-fold desc="一部分">
 function showLawTagbox(element) {
     $(element).parent().parent().find(".law-tags-box").show(450);
@@ -239,6 +243,7 @@ $(function(){
     dialog=$("#LawModal .modal-dialog");
     dialog.css("width","500px");
     valign(dialog,200);
+
 
 })
 /**

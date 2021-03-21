@@ -30,6 +30,16 @@ public class User extends BaseBean implements UserDetails {
     private Date createTime;
     private Date updateTime;
 
+    public User(String phoneNumber, String password, AccountStatus accountStatus, boolean passwordStatus) {
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.accountStatus = accountStatus;
+        this.passwordStatus = passwordStatus;
+    }
+
+    public User() {
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;

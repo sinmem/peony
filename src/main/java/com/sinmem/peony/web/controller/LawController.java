@@ -167,4 +167,9 @@ public class LawController {
     public String getLegals(){
         return lawService.getLegals().toString();
     }
+
+    @GetMapping("/getSimpleLawTree")
+    public String getSimpleLawTree(Long lawId){
+        return lawService.getSimpleLawTree(lawId).toString();
+    }
 }

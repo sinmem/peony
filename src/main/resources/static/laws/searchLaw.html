@@ -162,6 +162,9 @@
                 methods: {
                     toRemark: function (id) {
                         window.location.href = 'remark.html?lawId=' + id;
+                    },
+                    toReading:function(id){
+                        window.location.href = 'reading.html?lawId=' + id;
                     }
                 }
             });
@@ -595,7 +598,7 @@
                                 <div class="">
                                     <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-newspaper-o" @click="toRemark(item.id)">法条全景</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-object-group">法条解读</span></button>
+                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-object-group" @click="toReading(item.id)">法条解读</span></button>
                                 </div>
                             </div>
                         </td>

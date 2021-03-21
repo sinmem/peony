@@ -121,7 +121,7 @@
 <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
 <!--                <configuration>-->
 <!--                    &lt;!&ndash;配置主类&ndash;&gt;-->
-<!--                    <mainClass>com.sinmem.peony.web.PeonyApplication</mainClass>-->
+<!--                    <mainClass>com.sinmem.peony.PeonyApplication</mainClass>-->
 <!--                </configuration>-->
 <!--            </plugin>-->
 
@@ -148,7 +148,7 @@
                                         <addClasspath>true</addClasspath>
                                         <classpathPrefix>lib/</classpathPrefix>
                                         <useUniqueVersions>false</useUniqueVersions>
-                                        <mainClass>com.sinmem.peony.web.PeonyApplication</mainClass>
+                                        <mainClass>com.sinmem.peony.PeonyApplication</mainClass>
                                     </manifest>
                                     <manifestEntries>
                                         <Class-Path>./</Class-Path>

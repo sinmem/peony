@@ -101,7 +101,7 @@
                 }
             });
             $.get("/web/v1/law/getLawById",{"lawId": lawId},function (data) {
-                console.log(data)
+                console.log(data);
                 rVue.law = data.content;
             },"json");
             localStorage.removeItem("lawId");
@@ -109,7 +109,7 @@
             // ue.ready(function () {
             //     deleteEditor();
             // })
-        })
+        });
 
 
         /**

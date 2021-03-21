@@ -28,6 +28,12 @@ public interface LawMapper {
     @Select("SELECT * FROM v_law vl WHERE vl.id = #{id}")
     public LawCompleteDto queryLawById(Long id);
 
+    @Select("SELECT * FROM t_law tl WHERE tl.id = #{id}")
+    public LawBean getSimpleLawById(Long id);
+
+    @Select("SELECT * FROM t_law tl WHERE tl.legal_name = #{legal_name}")
+    public List<LawBean> getSimpleLawByLegalName(Long legal_name);
+
     @Results(id = "LawMap",value = {
             @Result(property = "id", column = "id", id = true),
             @Result(property = "no", column = "no"),

@@ -7,8 +7,6 @@ import com.sinmem.peony.dao.bean.TagBean;
 import com.sinmem.peony.dao.dto.LawBriefDto;
 import com.sinmem.peony.dao.dto.LawCompleteDto;
 import com.sinmem.peony.dao.dto.TagLawsDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.Year;
 import java.util.List;
@@ -82,4 +80,11 @@ public interface LawService {
     Result getOldLaws(Long thisLawId);
 
     Result getLegals();
+
+    /**
+     * 获取
+     * @return
+     * @param lawId
+     */
+    Result getSimpleLawTree(Long lawId);
 }

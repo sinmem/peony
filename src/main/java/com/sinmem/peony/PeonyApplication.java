@@ -1,4 +1,4 @@
-package com.sinmem.peony.web;
+package com.sinmem.peony;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

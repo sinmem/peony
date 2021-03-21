@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>法条全景</title>
     <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
-    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <!--    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
     <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
@@ -20,6 +21,7 @@
     <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="../ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="./../js/my-tree.js"></script>
     <script>
         let lawId = GetQueryString("lawId");
         let rVue;
@@ -69,6 +71,7 @@
                     remarkType: "REMARK",
                     content: "",
                     isAppendTo: false,
+                    treeData: {},
                 },
                 filters: {
                     countFilter: function (count) {
@@ -100,8 +103,6 @@
                         return content;
                     },
                     // toHtml:function (str, id) {
-                    //     console.log(str);
-                    //     console.log(id);
                     //     if(id == 1){
                     //         $("#remark-content").html(str.content)
                     //     }else {
@@ -109,19 +110,35 @@
                     //     }
                     // }
                 },
-                methods: {}
+                methods: {
+                    addTag: function (id) {
+                        dialog = $("#TagModal .modal-dialog");
+                        dialog.css("width", "500px");
+                        valign(dialog, 200);
+                        showTagModal(id, "添加标签", "/web/v1/tag/mange/addLawTag")
+                    }
+                },
+                components: {
+                    'my-tree': myTree
+                }
             });
 
             $.get("/web/v1/law/getLawById", {"lawId": lawId}, function (data) {
-                console.log(data)
+                // console.log("law",data);
                 rVue.law = data.content;
                 showbuttom();
-            }, "json")
+            }, "json");
+            $.get("/web/v1/law/getSimpleLawTree", {"lawId": lawId}, function (data) {
+                console.log("getSimpleLawTree", data);
+                console.log("data.content.legal", data.content.legal);
+                rVue.treeData = data.content.legal;
+                showbuttom();
+            }, "json");
             //必须等待ue创建完成在可以使用
             ue.ready(function () {
                 deleteEditor();
             })
-        })
+        });
 
 
         /**
@@ -136,126 +153,242 @@
 
     </script>
     <script>
+
+        /**
+         * @param el 被选中的元素
+         * @param title 标题
+         * @param action 目标地址
+         */
+        function showTagModal(id, title, action) {
+            $("#TagModal").modal("show");
+            $("#TagModal .modal-title").html(title);
+            let btn = $("#TagModal .btnSure");
+            // 要取消模态框中确认按钮先前绑定的事件
+            btn.unbind("click")
+            btn.bind('click', function () {
+                let legalCase = $("#legalCase").val();
+                let data = {
+                    "tagName": legalCase,
+                    "lawIds": id
+                };
+                // console.log($(el).parent().prev().get())
+                // console.log(data)
+                showDialogModal("标签提交确认", "标签: ", legalCase, function () {
+                    $.post(action, data, function (data) {
+                        showLogModal("页面提示", title + "成功", function () {
+                            location.reload();
+                        });
+                        console.log(data);
+                    }, "json")
+                })
+                $("#TagModal").modal("hide");
+            })
+
+        }
     </script>
+    <style>
+        #tagAddBadge {
+            cursor: pointer;
+        }
+
+        #tagAddBadge:hover {
+            background-color: #ccc;
+            color: #1d2124;
+        }
+        .my-tree{
+            font-size: 14px;
+        }
+        .my-tree ul{
+            list-style: none;
+            padding-left: 1.5em;
+        }
+        .my-tree li{
+            list-style: none;
+            padding-left: 0em;
+        }
+    </style>
 </head>
 <body>
-<div class="container-fluid row">
+<div id="content"class="container-fluid row mt-3">
     <div class="col-1"></div>
-    <div class="col-10">
-        <div id="nav">
-            <button class="btn btn-light">
-                <a href="searchLaw.html" title="点击返回搜索页"><span class="fa fa-mail-reply">返回主页</span></a>
-            </button>
-        </div>
-        <div id="content" class="card">
-            <div id="law-content" class="card-text">
-                <input type="hidden" name="id" :value="law.id">
-                <h2 class="text-center card-header mb-4">
-                    <div class="card-title">{{law.fullName}}</div>
-                </h2>
+    <div class="col-2">
+        <div class="card">
+            <div class="card-body my-tree">
+                <my-tree :item="treeData"></my-tree>
             </div>
-            <div class="card-body">
-                <p>{{law.content}}</p>
+        </div>
+    </div>
+    <div class="col-6">
+        <div>
 
-                <div class="tags">
-                    <div v-if="law.legalTags && law.legalTags.length > 0">
-                        <div class="law-tags-bar" v-if="law.legalTags.length <= 6">
-                            <span class="fa fa-tags">标签: </span>
-                            <span class="law-tag-span btn btn-outline-info" disabled v-for="tagItem in law.legalTags" :title="tagItem.name">
+            <div class="">
+               <div class="card">
+                   <div id="law-content" class="card-header">
+                       <input type="hidden" name="id" :value="law.id">
+                       <h2 class="text-center card-text mb-4">
+                           <div class="card-title">{{law.fullName}}</div>
+                       </h2>
+                       <!--                    <button class="btn btn-light float-right">-->
+                       <!--                        <a href="searchLaw.html" title="点击返回搜索页"><span class="fa fa-mail-reply">返回主页</span></a>-->
+                       <!--                    </button>-->
+                   </div>
+                   <div class="card-body">
+                       <p>{{law.content}}</p>
+
+                       <div class="tags">
+                           <div v-if="law.legalTags && law.legalTags.length > 0">
+                               <div class="law-tags-bar" v-if="law.legalTags.length <= 6">
+                                   <span class="fa fa-tags">标签: </span>
+                                   <span class="law-tag-span badge badge-info" disabled v-for="tagItem in law.legalTags"
+                                         :title="tagItem.name">
                                         {{tagItem.name|nameFilter(6)}}
                                     </span>
-                            <a onclick="showLawTagbox(this)" title="展开标签">
-                                <span class="fa fa-angle-double-down"></span>
-                            </a>
-                        </div>
-                        <div class="law-tags-bar" v-else>
-                            <span class="fa fa-tags">标签: </span>
-                            <span class="law-tag-span  btn btn-outline-info" disabled v-for="tagIndex in 5" :title="law.legalTags[tagIndex-1].name">
+                                   <a onclick="showLawTagbox(this)" title="展开标签">
+                                       <span class="fa fa-angle-double-down"></span>
+                                   </a>
+                               </div>
+                               <div class="law-tags-bar" v-else>
+                                   <span class="fa fa-tags">标签: </span>
+                                   <span class="law-tag-span  badge badge-info" disabled v-for="tagIndex in 5"
+                                         :title="law.legalTags[tagIndex-1].name">
                                     {{law.legalTags[tagIndex-1].name|nameFilter(6)}}
                                 </span>
-                            ...
-                            <a href="#" onclick="showLawTagbox(this)" title="展开标签">
-                                <span class="fa fa-angle-double-down"></span>
-                            </a>
-                        </div>
-                        <div class="law-tags-box" style="display: none">
-                            <span class="fa fa-tags">标签:</span>
-                            <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
-                                <span class="fa fa-angle-double-up"></span>
-                            </a>
-                            <div class="law-tags-container">
-                                <a v-for="tagItem in law.legalTags" title="点击以在下方显示该标签全部其他法条" onclick="getThisTagOthers(this)">
-                                    <input type="hidden" :value="tagItem.id" name="tagId">
-                                    <input type="hidden" :value="law.id" name="lawId">
-                                    <button class="law-tag-button btn btn-outline-info">
-                                        <span class="fa fa-tag">{{tagItem.name}}</span>
-                                    </button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else>
-                        <span class="fa fa-tags">暂无标签: </span>
-                    </div>
-                </div>
-                <div class="Legal-case">
-                    <input type="hidden" name="lawId" :value="law.id">
-                    <div class="case-box" v-if="law.caseCount > 0">
-                        <span class="fa fa-link">案例: </span>
-                        <a title="点击查看" onclick="showCase(this)" href="javascript:;" class="card-link">查看案例</a>
-                        <!--                                <span class="fa fa-link">案例: </span>-->
-                        <!--                                <a href="#" onclick="showLawCase(this)" title="展开">-->
-                        <!--                                    <span class="fa fa-angle-double-down"></span>-->
-                        <!--                                </a>-->
-                        <!--                                <a href="#" onclick="hideLawCase(this)" title="隐藏">-->
-                        <!--                                    <span class="fa fa-angle-double-up" style="display: none"></span>-->
-                        <!--                                </a>-->
-                        <!--                                <div class="case-container" style="display: none">-->
-                        <!--                                    <span onclick="updCase(this)" class="fa fa-pencil"></span>-->
-                        <!--                                    <a v-if="law.legalCase != null" :href="law.legalCase.url" title="点击查看案例">-->
-                        <!--                                        <input type="hidden" name="lawId" :value="law.id">-->
-                        <!--                                        <button class="law-tag-button btn btn-outline-info">-->
-                        <!--                                            <span class="fa fa-link">{{law.legalCase.name}}</span>-->
-                        <!--                                        </button>-->
-                        <!--                                    </a>-->
-                        <!--                                    <a v-else title="查询中请稍等" disabled>-->
-                        <!--                                        <button class="law-tag-button btn btn-outline-info">-->
-                        <!--                                            <span class="fa fa-link">正在查询</span>-->
-                        <!--                                        </button>-->
-                        <!--                                    </a>-->
-                        <!--                                </div>-->
-                    </div>
-                    <span class="case-box lost" v-else>
+                                   ...
+                                   <a href="#" onclick="showLawTagbox(this)" title="展开标签">
+                                       <span class="fa fa-angle-double-down"></span>
+                                   </a>
+                               </div>
+                               <div class="law-tags-box" style="display: none">
+                                   <span class="fa fa-tags">标签:</span>
+                                   <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
+                                       <span class="fa fa-angle-double-up"></span>
+                                   </a>
+                                   <div class="law-tags-container">
+                                       <a v-for="tagItem in law.legalTags" title="点击以在下方显示该标签全部其他法条">
+                                           <!--onclick="getThisTagOthers(this)"-->
+                                           <input type="hidden" :value="tagItem.id" name="tagId">
+                                           <input type="hidden" :value="law.id" name="lawId">
+                                           <div class="law-tag-button badge badge-info">
+                                               <span class="fa fa-tag">{{tagItem.name}}</span>
+                                           </div>
+                                       </a>
+                                   </div>
+                               </div>
+                           </div>
+                           <div v-else>
+                               <span class="fa fa-tags">标签: </span>
+                           </div>
+                           <div class="law-tag-button badge badge-secondary float-right ml-1" id="tagAddBadge"
+                                @click="addTag(law.id)" style="position:relative;top:-22px">
+                               <span class="fa fa-plus"> 添加标签</span>
+                           </div>
+                       </div>
+                       <div class="Legal-case">
+                           <input type="hidden" name="lawId" :value="law.id">
+                           <div class="case-box" v-if="law.caseCount > 0">
+                               <span class="fa fa-link">案例: </span>
+                               <a title="点击查看" onclick="showCase(this)" href="javascript:;" class="card-link">查看案例</a>
+                           </div>
+                           <span class="case-box lost" v-else>
                                 <span class="fa fa-link">案例: </span>
                                 <a title="点击添加" onclick="addCase(this)">暂无案例</a>
                             </span>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="remark-content" v-if="law.legalRemark != null && law.legalRemark.length >0"
-                     v-html="law.legalRemark[0].content">
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="dissent-content" v-if="law.legalRemark != null && law.legalRemark.length>1"
-                     v-html="law.legalRemark[1].content">
-                </div>
-            </div>
+                       </div>
+                   </div>
+                   <div class="card-body">
+                       <div id="remark-content" v-if="law.legalRemark != null && law.legalRemark.length >0"
+                            v-html="law.legalRemark[0].content">
+                       </div>
+                   </div>
+                   <div class="card-body">
+                       <div id="dissent-content" v-if="law.legalRemark != null && law.legalRemark.length>1"
+                            v-html="law.legalRemark[1].content">
+                       </div>
+                   </div>
+               </div>
 
-        </div>
-        <div class="">
-            <span class="btn btn-primary put-remark addR" onclick="createUE(1,false)">添加备注</span>
-            <span class="btn btn-primary put-remark addD" onclick="createUE(2,false)">添加驳斥</span>
-            <span class="btn btn-primary put-remark updR" onclick="createUE(1,true)">修改备注</span>
-            <span class="btn btn-primary put-remark updD" onclick="createUE(2,true)">修改驳斥</span>
-            <span class="btn btn-primary submit-remark" onclick="userSubmit()">提交</span>
-            <span class="btn btn-primary submit-remark" onclick="adminSubmit()">管理员提交</span>
-            <span class="btn btn-warning submit-remark" onclick="cancelSubmit()">取消</span>
+            </div>
+            </div>
+            <div class="">
+                <span class="btn btn-primary put-remark addR" onclick="createUE(1,false)">添加备注</span>
+                <span class="btn btn-primary put-remark addD" onclick="createUE(2,false)">添加驳斥</span>
+                <span class="btn btn-primary put-remark updR" onclick="createUE(1,true)">修改备注</span>
+                <span class="btn btn-primary put-remark updD" onclick="createUE(2,true)">修改驳斥</span>
+                <span class="btn btn-primary submit-remark" onclick="userSubmit()">提交</span>
+                <span class="btn btn-primary submit-remark" onclick="adminSubmit()">管理员提交</span>
+                <span class="btn btn-warning submit-remark" onclick="cancelSubmit()">取消</span>
+            </div>
         </div>
     </div>
-    <div class="col-1"></div>
+    <div class="col-2"></div>
 </div>
 
+<div class="modals">
+    <div id="TagModal" class="modal fade" tabindex="-1" data-backdrop="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    标签名: <input type="text" name="legalCase" id="legalCase" placeholder="请输入标签名称"/><br>
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-primary btnSure">添加</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div id="DialogModal" class="modal fade" tabindex="-1" data-backdrop="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">提交确认- <span></span></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <label></label> <span disabled id="name" class="btn disabled btn-sm btn-outline-primary"></span>
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-primary btnSure">确认</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div id="logModal" class="modal fade" tabindex="-1" data-backdrop="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</div>
 <script id="editor" type="text/plain" style="width:100%;height:500px;"></script>
 </body>
 <script>
@@ -266,7 +399,7 @@
         } else {
             $(".put-remark").hide();
             $(".submit-remark").hide();
-            console.log(rVue.law.legalRemark);
+            // console.log(rVue.law.legalRemark);
             if (rVue.law.legalRemark == null || rVue.law.legalRemark.length === 0) {
                 $(".btn.btn-primary.put-remark.addR").show();
                 $(".btn.btn-primary.put-remark.addD").show();
@@ -306,7 +439,7 @@
     }
 
     function adminSubmit() {
-        console.log(getContent());
+        // console.log(getContent());
         $(".put-remark").show();
         $(".submit-remark").hide()
         let data = {
@@ -316,7 +449,7 @@
         };
         let url = rVue.isAppendTo ? "/web/v1/remark/updRemark" : "/web/v1/remark/addRemark";
         // console.log(data);
-        console.log(url);
+        // console.log(url);
         $.post(url, data, function (data) {
             showLogModal("备注提示", "备注" + (rVue.isAppendTo ? "修改成功" : "添加成功") + "(3s后自动关闭)", function () {
                 setTimeout(function () {
@@ -352,7 +485,7 @@
             }
         }
         rVue.isAppendTo = isAppendTo;
-        console.log(rVue.remarkType);
+        // console.log(rVue.remarkType);
         isShow = true;
         showbuttom();
         //实例化编辑器
@@ -387,7 +520,9 @@
             window.location.href = "remark.html?lawId=" + rVue.law.id;
             return false;
         });
-        callback.call();
+        if (callback) {
+            callback.call();
+        }
     }
 
     $(function () {
@@ -403,24 +538,4 @@
 
     })
 </script>
-<div id="logModal" class="modal fade" tabindex="-1" data-backdrop="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title"></h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-            </div>
-            <div class="modal-footer">
-                <div>
-                    <button type="button" class="btn btn-primary" id="btnSure">确认</button>
-                </div>
-            </div>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
 </html>

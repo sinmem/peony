@@ -23,5 +23,8 @@ public interface LegalNameMapper {
     int isContains(@Param("id")Long id);
 
     @Select("SELECT id,full_name FROM t_legal_name")
-    List<LegalNameDto> getAll();
+    List<LegalNameDto> getAllSimpleLegal();
+
+    @Select("SELECT * FROM t_legal_name")
+    List<LegalName> getAll();
 }
