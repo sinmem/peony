@@ -15,6 +15,12 @@
     <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
     <script src="./../js/law-main.js"></script>
     <script>
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURI(r[2]);
+            return null;
+        }
         function getNewLaw(el) {
             let id = $(el).parents(".list-content").find(".item-checkbox").val();
             $.get("/web/v1/law/getNewLaw", {thisLawId: id}, function (data) {
@@ -47,6 +53,7 @@
         let lawVue;
         let legalVue;
         let $law;
+        let legalName = GetQueryString("legalName");
 
         function toUpdateLaws() {
             let tempLaw = $(".result-content  .item-checkbox:checked").get();
@@ -93,6 +100,7 @@
                 el: "#content",
                 data: {
                     usr: {},
+                    legalName:legalName,
                     conditionList: [],
                     fullName: 0,
                     tag: 0,
@@ -451,7 +459,7 @@
                 <span class="ml-5"></span>
                 <div class="input-group col">
                     <input class="search-input form-control" autofocus name="conditions"
-                           placeholder="请输入法律全称,将在法律全称中进行匹配">
+                           placeholder="请输入法律全称,将在法律全称中进行匹配" :value="legalName">
                     <button class="search-btn btn btn-primary input-group-prepend"
                             onclick="sFullName(this.parentElement)"><span class="fa fa-search"></span> 搜索
                     </button>

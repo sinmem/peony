@@ -210,12 +210,18 @@ public class LawServiceImpl implements LawService {
 
     private TreeNode SimpleLawTree;
 
-    private synchronized TreeNode getSimpleTree() {
+    private static final String LOCK = "SimpleLawTree_LOCK";
+    private TreeNode getSimpleTree() {
         if (SimpleLawTree == null) {
-            TreeNode root = createRoot();
-            SimpleLawTree = root;
-            List<LegalName> allLegal = legalNameMapper.getAll();
-            root.setChildren(generateCategories(allLegal));
+            synchronized (LOCK){
+                if(SimpleLawTree==null){
+                    System.out.println("gdsfuilsadflusdahgo");
+                    TreeNode root = createRoot();
+                    SimpleLawTree = root;
+                    List<LegalName> allLegal = legalNameMapper.getAll();
+                    root.setChildren(generateCategories(allLegal));
+                }
+            }
         }
         return SimpleLawTree;
     }
@@ -242,7 +248,9 @@ public class LawServiceImpl implements LawService {
         for (LegalName item : aCategoryLegal) {
             TreeNode node = new TreeNode();
             node.setId(item.getId());
-            node.setContent(item.getAbbreviation() + "(" + item.getCount() + "条)");
+            List<LawBean> lawList = lawMapper.getSimpleLawByLegalName(item.getId());
+            node.setChildren(generateLaws(lawList));
+            node.setContent(item.getAbbreviation() + "(" + lawList.size() + "条)");
             node.setTitle(item.getFullName());
             node.setExtra("Legal");
             children.add(node);
@@ -256,14 +264,9 @@ public class LawServiceImpl implements LawService {
             TreeNode node = new TreeNode();
             node.setId(item.getId());
             String content = item.getContent();
-            int index = content.indexOf("条");
-            if(index>0) {
-                String substring = content.substring(0, index + 1);
-                node.setContent(substring);
-            }else {
-                node.setContent(content);
-            }
-            node.setTitle(content);
+            String lawContent = "第" + item.getNo() + "条";
+            node.setContent(lawContent);
+            node.setTitle(lawContent);
             node.setExtra("Legal");
             children.add(node);
         }

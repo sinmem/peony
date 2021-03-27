@@ -47,7 +47,7 @@
                 </div>
                 <div v-else>
                     <div v-if="isAdmin" class="card-body">
-                        <p class="card-text text-center text-secondary">本法条还未有解读, 请添加!</p>
+                        <p class="card-text text-center text-secondary" @click="showEdit()" style="cursor:pointer;">本法条还未有解读, 点击添加!</p>
                     </div>
                     <div v-else class="card-body">
                         <p class="card-text text-center text-secondary">本法条还未有解读, 等待管理员添加!</p>
@@ -205,6 +205,9 @@
                            alert("提交成功")
                        }
                     }, "json")
+                },
+                showEdit(){
+                    this.isShow=true;
                 }
 
             },

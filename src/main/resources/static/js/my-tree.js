@@ -1,6 +1,6 @@
 var myTree = Vue.component("my-tree",
     {
-        template: '<li :class="">\n' +
+        template: '<li :class="" style="cursor:pointer;">\n' +
             '            <div :title="getTitle" \n' +
             '                    :class="getClass"\n' +
             '                    @click="toggle"\n' +
@@ -47,6 +47,9 @@ var myTree = Vue.component("my-tree",
             toggle: function () {
                 if (this.isFolder) {
                     this.isOpen = !this.isOpen;
+                }else if(this.item.extra==="Legal"){
+                    console.log(encodeURI(this.item.title));
+                    window.open('remark.html?lawId=' + this.item.id);
                 }
             },
             makeFolder: function () {
