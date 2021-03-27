@@ -215,7 +215,9 @@ function showDialogModal(title, label, content, callback) {
     btn.unbind("click")
     btn.bind('click', function () {
         content = $("#DialogModal input[name=name]").val();
-        callback.call(this, content);
+        if(callback){
+            callback.call(this, content);
+        }
         $("#DialogModal").modal("hide");
     })
 }

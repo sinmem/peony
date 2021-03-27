@@ -8,6 +8,7 @@ import com.sinmem.peony.common.enums.LawStatus;
 import com.sinmem.peony.common.enums.Msg;
 import com.sinmem.peony.common.exception.DataOperationException;
 import com.sinmem.peony.common.exception.ValidationException;
+import com.sinmem.peony.common.utils.GsonUtils;
 import com.sinmem.peony.dao.bean.LawBean;
 import com.sinmem.peony.dao.bean.LegalName;
 import com.sinmem.peony.dao.bean.TagBean;
@@ -138,6 +139,11 @@ public class LawServiceImpl implements LawService {
     @Override
     public ResultPage<LawBriefDto> getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw) {
         Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.getThisTagOthers(thisTag, thisLaw));
+        return new ResultPage(page);
+    }
+    @Override
+    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw) {
+        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.getThisTagOthers2(thisTag, thisLaw));
         return new ResultPage(page);
     }
 

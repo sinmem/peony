@@ -63,7 +63,7 @@ public class ControllerPageAspect {
         pageNum = (Integer) objs[0];
         pageSize = (Integer) objs[1];
         objs[0] = pageNum == null ? defaultNum:pageNum;
-        objs[1] = (pageSize == null || pageSize <= 0 || pageSize >100) ? defaultSize : pageSize;
+        objs[1] = (pageSize == null || pageSize < 0 || pageSize >100) ? defaultSize : pageSize;
         return objs;
     }
 }

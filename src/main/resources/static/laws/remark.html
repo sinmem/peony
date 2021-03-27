@@ -24,6 +24,17 @@
     <script src="./../js/my-tree.js"></script>
     <script>
         let lawId = GetQueryString("lawId");
+
+        /**
+         * @return {string}
+         */
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+
         let rVue;
         let isShow = false;// 富文本是否已经显示
         let ue = UE.getEditor('editor', {
@@ -63,11 +74,27 @@
                 ]
             ]
         });
+    </script>
+    <script>
         $(function () {
             rVue = new Vue({
                 el: "#content",
                 data: {
-                    law: "",
+                    law: {
+                        legalTags:[
+                            {
+                                otherLaws:[],
+                                id:0,
+                                name:"",
+                                count:1
+                            }
+                        ],
+                        fullName:"",
+                        id:lawId,
+                        content:"",
+                        releaseTime: {},
+                        status:"",
+                    },
                     remarkType: "REMARK",
                     content: "",
                     isAppendTo: false,
@@ -93,8 +120,8 @@
                         }
                     },
                     subContent: function (content, maxSize) {
-                        maxSize == undefined ? 10 : maxSize;
-                        if (content == undefined) {
+                        maxSize = !! maxSize ? 10 : maxSize;
+                        if (!!content) {
                             return "错误数据";
                         }
                         if (content.length > maxSize) {
@@ -102,13 +129,10 @@
                         }
                         return content;
                     },
-                    // toHtml:function (str, id) {
-                    //     if(id == 1){
-                    //         $("#remark-content").html(str.content)
-                    //     }else {
-                    //         $("#dissent-content").html(str.content)
-                    //     }
-                    // }
+                    titleFilter(tag){
+                        if(tag)
+                        return `${tag.name} (${tag.count}) 法条`
+                    }
                 },
                 methods: {
                     addTag: function (id) {
@@ -116,21 +140,45 @@
                         dialog.css("width", "500px");
                         valign(dialog, 200);
                         showTagModal(id, "添加标签", "/web/v1/tag/mange/addLawTag")
-                    }
+                    },
+                    getOtherLaws(tag){
+                        if(tag){
+                            if(!tag.otherLaws||tag.otherLaws.length===0){
+                                let param = {
+                                    thisTag:tag.id,
+                                    thisLaw:lawId,
+                                    showTag:[],
+                                    pageSize:0
+                                };
+                                $this = this;
+                                $.get("/web/v1/law/getThisTagOthers2", param, function (data) {
+                                    if (data.code === 10002) {
+                                        alert("页面提示-非法获取方式", "禁止获取已通过法条标签查找显示的法条!");
+                                    } else if (data.code === 0) {
+                                        tag.otherLaws = data.content.pageContent;
+                                        console.log("data.content",$this.law);
+                                    }
+                                }, "json");
+                            }
+                        }
+                    },
+                    hasOtherLaws(tag){
+                        return !!(tag && tag.otherLaws && tag.otherLaws.length > 0);
+                    },
                 },
                 components: {
-                    'my-tree': myTree
+                    'my-tree': myTree,
+                },
+                computed:{
                 }
             });
 
             $.get("/web/v1/law/getLawById", {"lawId": lawId}, function (data) {
-                // console.log("law",data);
+                console.log("law",data);
                 rVue.law = data.content;
                 showbuttom();
             }, "json");
             $.get("/web/v1/law/getSimpleLawTree", {"lawId": lawId}, function (data) {
-                console.log("getSimpleLawTree", data);
-                console.log("data.content.legal", data.content.legal);
                 rVue.treeData = data.content.legal;
                 showbuttom();
             }, "json");
@@ -139,17 +187,6 @@
                 deleteEditor();
             })
         });
-
-
-        /**
-         * @return {string}
-         */
-        function GetQueryString(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]);
-            return null;
-        }
 
     </script>
     <script>
@@ -166,13 +203,27 @@
             // 要取消模态框中确认按钮先前绑定的事件
             btn.unbind("click")
             btn.bind('click', function () {
-                let legalCase = $("#legalCase").val();
+                let legalCase = $("#legalCase").val().trim();
+                if(!legalCase||legalCase.length===0){
+                    $("#TagModal").modal("hide");
+                    showDialogModal("标签提交提示", null, "添加失败, 标签为空");
+                    return;
+                }
+                if(rVue.law.legalTags){
+                    let tags = rVue.law.legalTags;
+                    for (let i = 0; i < tags.length; i++) {
+                        console.log("legalCase===tags[i]",legalCase===tags[i]);
+                        if(legalCase===tags[i].name){
+                            $("#TagModal").modal("hide");
+                            showDialogModal("标签提交提示", null, "添加失败, 重复的标签");
+                            return;
+                        }
+                    }
+                }
                 let data = {
                     "tagName": legalCase,
                     "lawIds": id
                 };
-                // console.log($(el).parent().prev().get())
-                // console.log(data)
                 showDialogModal("标签提交确认", "标签: ", legalCase, function () {
                     $.post(action, data, function (data) {
                         showLogModal("页面提示", title + "成功", function () {
@@ -195,21 +246,24 @@
             background-color: #ccc;
             color: #1d2124;
         }
-        .my-tree{
+
+        .my-tree {
             font-size: 14px;
         }
-        .my-tree ul{
+
+        .my-tree ul {
             list-style: none;
             padding-left: 1.5em;
         }
-        .my-tree li{
+
+        .my-tree li {
             list-style: none;
             padding-left: 0em;
         }
     </style>
 </head>
 <body>
-<div id="content"class="container-fluid row mt-3">
+<div id="content" class="container-fluid row mt-3">
     <div class="col-1"></div>
     <div class="col-2">
         <div class="card">
@@ -222,101 +276,65 @@
         <div>
 
             <div class="">
-               <div class="card">
-                   <div id="law-content" class="card-header">
-                       <input type="hidden" name="id" :value="law.id">
-                       <h2 class="text-center card-text mb-4">
-                           <div class="card-title">{{law.fullName}}</div>
-                       </h2>
-                       <!--                    <button class="btn btn-light float-right">-->
-                       <!--                        <a href="searchLaw.html" title="点击返回搜索页"><span class="fa fa-mail-reply">返回主页</span></a>-->
-                       <!--                    </button>-->
-                   </div>
-                   <div class="card-body">
-                       <p>{{law.content}}</p>
+                <div class="card">
+                    <div id="law-content" class="card-header">
+                        <input type="hidden" name="id" :value="law.id">
+                        <h2 class="text-center card-text mb-4">
+                            <div class="card-title">{{law.fullName}}</div>
+                        </h2>
+                        <!--                    <button class="btn btn-light float-right">-->
+                        <!--                        <a href="searchLaw.html" title="点击返回搜索页"><span class="fa fa-mail-reply">返回主页</span></a>-->
+                        <!--                    </button>-->
+                    </div>
+                    <div class="card-body">
+                        <div class="text-right ml-0 mb-2 text-secondary disabled">发布时间: {{law.releaseTime.year}} 年</div>
+                        <p>{{law.content}}</p>
 
-                       <div class="tags">
-                           <div v-if="law.legalTags && law.legalTags.length > 0">
-                               <div class="law-tags-bar" v-if="law.legalTags.length <= 6">
-                                   <span class="fa fa-tags">标签: </span>
-                                   <span class="law-tag-span badge badge-info" disabled v-for="tagItem in law.legalTags"
-                                         :title="tagItem.name">
+                        <div class="tags">
+                            <div v-if="law.legalTags && law.legalTags.length > 0">
+                                <div class="law-tags-bar">
+                                    <span class="fa fa-tags">标签: </span>
+                                    <span class="law-tag-span badge badge-info mr-1 " style="cursor:pointer;" disabled
+                                          v-for="tagItem in law.legalTags"
+                                          :title="tagItem|titleFilter">
                                         {{tagItem.name|nameFilter(6)}}
                                     </span>
-                                   <a onclick="showLawTagbox(this)" title="展开标签">
-                                       <span class="fa fa-angle-double-down"></span>
-                                   </a>
-                               </div>
-                               <div class="law-tags-bar" v-else>
-                                   <span class="fa fa-tags">标签: </span>
-                                   <span class="law-tag-span  badge badge-info" disabled v-for="tagIndex in 5"
-                                         :title="law.legalTags[tagIndex-1].name">
-                                    {{law.legalTags[tagIndex-1].name|nameFilter(6)}}
-                                </span>
-                                   ...
-                                   <a href="#" onclick="showLawTagbox(this)" title="展开标签">
-                                       <span class="fa fa-angle-double-down"></span>
-                                   </a>
-                               </div>
-                               <div class="law-tags-box" style="display: none">
-                                   <span class="fa fa-tags">标签:</span>
-                                   <a href="#" onclick="showLawTagbar(this)" title="缩略显示">
-                                       <span class="fa fa-angle-double-up"></span>
-                                   </a>
-                                   <div class="law-tags-container">
-                                       <a v-for="tagItem in law.legalTags" title="点击以在下方显示该标签全部其他法条">
-                                           <!--onclick="getThisTagOthers(this)"-->
-                                           <input type="hidden" :value="tagItem.id" name="tagId">
-                                           <input type="hidden" :value="law.id" name="lawId">
-                                           <div class="law-tag-button badge badge-info">
-                                               <span class="fa fa-tag">{{tagItem.name}}</span>
-                                           </div>
-                                       </a>
-                                   </div>
-                               </div>
-                           </div>
-                           <div v-else>
-                               <span class="fa fa-tags">标签: </span>
-                           </div>
-                           <div class="law-tag-button badge badge-secondary float-right ml-1" id="tagAddBadge"
-                                @click="addTag(law.id)" style="position:relative;top:-22px">
-                               <span class="fa fa-plus"> 添加标签</span>
-                           </div>
-                       </div>
-                       <div class="Legal-case">
-                           <input type="hidden" name="lawId" :value="law.id">
-                           <div class="case-box" v-if="law.caseCount > 0">
-                               <span class="fa fa-link">案例: </span>
-                               <a title="点击查看" onclick="showCase(this)" href="javascript:;" class="card-link">查看案例</a>
-                           </div>
-                           <span class="case-box lost" v-else>
-                                <span class="fa fa-link">案例: </span>
-                                <a title="点击添加" onclick="addCase(this)">暂无案例</a>
-                            </span>
-                       </div>
-                   </div>
-                   <div class="card-body">
-                       <div id="remark-content" v-if="law.legalRemark != null && law.legalRemark.length >0"
-                            v-html="law.legalRemark[0].content">
-                       </div>
-                   </div>
-                   <div class="card-body">
-                       <div id="dissent-content" v-if="law.legalRemark != null && law.legalRemark.length>1"
-                            v-html="law.legalRemark[1].content">
-                       </div>
-                   </div>
-               </div>
-
-            </div>
-            </div>
-            <div class="">
-                <span class="btn btn-primary put-remark addR" onclick="createUE(1,false)">添加备注</span>
-                <span class="btn btn-primary put-remark addD" onclick="createUE(2,false)">添加驳斥</span>
-                <span class="btn btn-primary put-remark updR" onclick="createUE(1,true)">修改备注</span>
-                <span class="btn btn-primary put-remark updD" onclick="createUE(2,true)">修改驳斥</span>
-                <span class="btn btn-primary submit-remark" onclick="userSubmit()">提交</span>
-                <span class="btn btn-primary submit-remark" onclick="adminSubmit()">管理员提交</span>
-                <span class="btn btn-warning submit-remark" onclick="cancelSubmit()">取消</span>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <span class="fa fa-tags">标签: </span>
+                            </div>
+                            <div class="law-tag-button badge badge-secondary float-right ml-1" id="tagAddBadge"
+                                 @click="addTag(law.id)" style="position:relative;top:-22px">
+                                <span class="fa fa-plus"> 添加标签</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="accordion">
+                        <div class="card" v-if="tag.count>1" v-for="tag in  law.legalTags">
+                            <div class="card-header">
+                                <a class="card-link d-block" data-toggle="collapse" :href="'#'+tag.name" @click="getOtherLaws(tag)">
+                                    {{tag.name}}
+                                    <div class="float-right">
+                                        共{{tag.count-1}}个相关法条
+                                    </div>
+                                </a>
+                            </div>
+                            <div :id="tag.name" class="collapse" data-parent="#accordion">
+                                <div class="card-body" v-if="tag.otherLaws.length===0">
+                                    正在加载
+                                </div>
+                                <div class="card" v-for="aLaw in tag.otherLaws">
+                                    <div class="card-body">
+                                        <h5 class="text-center">{{aLaw.fullName}}</h5>
+                                        <p class="law-content mb-1">{{aLaw.content}}</p>
+                                        <div class="text-secondary float-right">发布时间: {{aLaw.releaseTime.year}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -49,6 +49,7 @@ public interface LawService {
     public List<TagLawsDto> getLawsByTags(TagBean[] tags, Integer pageNum, Integer pageSize);
 
     public ResultPage<LawBriefDto> getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw);
+    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw);
 
     /**
      * 修改法条, 同时将旧的法条状态修改为"被修改的"

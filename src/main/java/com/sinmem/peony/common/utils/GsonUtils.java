@@ -12,6 +12,7 @@ import com.google.gson.Gson;
  * @version: V1.0
  */
 public class GsonUtils {
+    private static final Gson G = new Gson();
     /**
      * 对象转Json字符串(自动忽略null属性)
      * @param obj
@@ -19,7 +20,7 @@ public class GsonUtils {
      * @return
      */
     public static <T> String toJson(T obj){
-        return new Gson().toJson(obj);
+        return G.toJson(obj);
     }
 
     /**

@@ -6,6 +6,9 @@ import com.sinmem.peony.dao.bean.LegalRemark;
 import com.sinmem.peony.dao.bean.TagBean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,7 +23,7 @@ public class LawCompleteDto extends LawBean{
     /**
      * 法条对应标签
      */
-    private List<TagBean> legalTags;
+    private List<TagDto> legalTags;
     /**
      * 法条对应案例列表
      */
@@ -30,11 +33,11 @@ public class LawCompleteDto extends LawBean{
      */
     private List<LegalRemark> legalRemark;
 
-    public List<TagBean> getLegalTags() {
+    public List<TagDto> getLegalTags() {
         return legalTags;
     }
 
-    public void setLegalTags(List<TagBean> legalTags) {
+    public void setLegalTags(List<TagDto> legalTags) {
         this.legalTags = legalTags;
     }
 

@@ -1,16 +1,17 @@
 package com.sinmem.peony.dao.mapper;
 
 import com.sinmem.peony.dao.bean.TagBean;
+import com.sinmem.peony.dao.dto.TagDto;
 import com.sinmem.peony.dao.provider.TagProvider;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 public interface TagMapper {
-    @Select("SELECT tt.id, tt.`name` " +
+    @Select("SELECT tt.id, tt.`name`,tt.count " +
             "FROM(t_tag_law ttl LEFT JOIN t_law tl on tl.id = ttl.law_id) LEFT JOIN t_tag tt on ttl.tag_id = tt.id " +
             "WHERE tl.id = #{lawId}")
-    public TagBean queryTagByLawId(Long lawId);
+    public TagDto queryTagByLawId(Long lawId);
 
 //    不再使用全文索引, 由于这里可能存在对同一列的多次模糊条件, 在这里不好拼接, 于是换成SelectProvider自定义SQL语句
 //    LawMapper,LegalNameMapper中使用同理

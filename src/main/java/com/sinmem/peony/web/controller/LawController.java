@@ -111,12 +111,36 @@ public class LawController {
      */
     @GetMapping("/getThisTagOthers")
     public String getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw,  Long...showTag){
-        for (Long tag : showTag) {
-            if(thisTag.equals(tag)){
-                return Result.error(Msg.E21002).setMessage("所查询数据已呈现").toString();
+        if(showTag!=null){
+            for (Long tag : showTag) {
+                if(thisTag.equals(tag)){
+                    return Result.error(Msg.E21002).setMessage("所查询数据已呈现").toString();
+                }
             }
         }
         return Result.success(lawService.getThisTagOthers(pageNum, pageSize, thisTag, thisLaw)).toString();
+    }
+
+    /**
+     * 通过要查询的标签id和本条法条id查询忽略本法条的含有给定标签id的
+     * 法条(排除标签查找时候已经显示出的标签id不就行查找)
+     * @param pageNum 当前页
+     * @param pageSize 页面大小
+     * @param thisTag 要查找的标签id
+     * @param thisLaw 本条法条id
+     * @param showTag 已进行搜索显示的标签id
+     * @return
+     */
+    @GetMapping("/getThisTagOthers2")
+    public String getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw,  Long...showTag){
+        if(showTag!=null){
+            for (Long tag : showTag) {
+                if(thisTag.equals(tag)){
+                    return Result.error(Msg.E21002).setMessage("所查询数据已呈现").toString();
+                }
+            }
+        }
+        return Result.success(lawService.getThisTagOthers2(pageNum, pageSize, thisTag, thisLaw)).toString();
     }
 
     /**

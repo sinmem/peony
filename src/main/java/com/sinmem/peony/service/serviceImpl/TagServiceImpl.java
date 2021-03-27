@@ -52,8 +52,8 @@ public class TagServiceImpl implements TagService {
                 tagMapper.addTag(oldTag);
                 successCount = tagMapper.addTagLaw(oldTag.getId(), lawIds);
             }else {
-                tagMapper.updateTagCountById(oldTag.getCount()+addCount, oldTag.getId());
                 successCount = tagMapper.addTagLaw(oldTag.getId(), lawIds);
+                tagMapper.updateTagCountById(oldTag.getCount()+addCount, oldTag.getId());
             }
         }catch (DuplicateKeyException ex){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

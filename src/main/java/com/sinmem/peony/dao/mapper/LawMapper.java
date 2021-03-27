@@ -57,6 +57,18 @@ public interface LawMapper {
     @Select("SELECT vl.* from v_law AS vl,(SELECT law_id FROM t_tag_law WHERE tag_id = #{thisTag} AND law_id <> #{thisLaw} ) AS rm WHERE rm.law_id = vl.id ORDER BY release_time desc, legal_name asc, `no` asc")
     public List<LawBriefDto> getThisTagOthers(@Param("thisTag") Long thisTag, @Param("thisLaw") Long thisLaw);
 
+    @Results(id = "LawMap2",value = {
+            @Result(property = "id", column = "id", id = true),
+            @Result(property = "no", column = "no"),
+            @Result(property = "content", column = "content"),
+            @Result(property = "fullName", column = "full_name"),
+            @Result(property = "status", column = "status"),
+            @Result(property = "releaseTime", column = "release_time"),
+            @Result(property = "id", column = "otherLaws"),
+    })
+    @Select("SELECT vl.* from v_law AS vl,(SELECT law_id FROM t_tag_law WHERE tag_id = #{thisTag} AND law_id <> #{thisLaw} ) AS rm WHERE rm.law_id = vl.id ORDER BY release_time desc, legal_name asc, `no` asc")
+    public List<LawBriefDto> getThisTagOthers2(@Param("thisTag") Long thisTag, @Param("thisLaw") Long thisLaw);
+
     @ResultMap("LawMap")
     @Select("SELECT tl.*,rm.full_name FROM t_law tl,(SELECT tln.full_name,tln.id FROM t_legal_name tln WHERE tln.id = #{fullNameId}) rm WHERE rm.id = tl.legal_name ORDER BY release_time desc, legal_name asc, `no` asc")
     public List<LawBriefDto> getLawsByFullName(Long fullNameId);
