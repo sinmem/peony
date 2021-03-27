@@ -24,6 +24,7 @@ $(function () {
                 'superscript',//	上标文本，与“subscript”命令互斥
                 'formatmatch',
                 'removeformat',
+                'link',
                 'forecolor',//	字体颜色
                 'backcolor',//背景
                 'horizontal', //分隔线

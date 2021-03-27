@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>评论申请列表</title>
+    <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+    <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
+    <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
+    <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./../plugins/bootstrap/bootstrap-switch.min.css" rel="stylesheet">
+    <script src="../js/MangeSearch.js"></script>
+    <link href="../css/searchStyle.css" rel="stylesheet">
+</head>
+<style>
+    div.tool-bar {
+        position: fixed;
+        left: 10px;
+        color: #cbb;
+    }
+
+    div.message-box {
+        position: fixed;
+        left: 80px;
+    }
+</style>
+<script>
+    let ListVue;
+    $(function () {
+        ListVue = new Vue({
+            el: "#TCase-list",
+            data: {
+                tempRemarks: [],
+                // 分页信息
+                // 分页查询地址
+                actionURL: "/web/v1/comment/getCommentsByAdmin",
+                // 页码
+                pageNum: 1,
+                // 页面大小
+                pageSize: 20,
+                // 总页数
+                pages: 0,
+                // 总条数
+                total: 0,
+            },
+            filters: {
+                subContent: function (content, maxSize) {
+                    maxSize = maxSize === undefined ? 10 : maxSize;
+                    if (content === undefined) {
+                        return "错误数据";
+                    }
+                    if (content.length > maxSize) {
+                        content = content.substring(0, maxSize) + "...";
+                    }
+                    return content;
+                },
+                formatTime: function (date) {
+                    return formatDate(date, "yyyy-MM-dd hh:mm:ss")
+                },
+            },
+            methods: {
+                showContent: function (content) {
+                    parent.showContentModal("评论申请详情", content)
+                }
+            }
+        });
+        showSearch();
+        $.get(ListVue.actionURL, {status:'TO_BE_REVIEWED'}, function (data) {
+            console.log(data);
+            setPageInfo(data.content);
+            showPageInfo(data.content);
+            ListVue.tempRemarks = data.content;
+            // console.log(data.content.pageContent);
+        }, "json")
+    });
+
+    function setPageInfo(data) {
+        ListVue.pageNum = data.pageNum;
+        ListVue.pageSize = data.pageSize;
+        ListVue.pages = data.pages;
+        ListVue.total = data.total;
+    }
+
+    function showSearch() {
+        $(".message-box").show();
+        $("#searching").show();
+        $("#pageInfo").hide();
+        $("#searchCondition").html("查找评论申请")
+    }
+
+    function showPageInfo(data) {
+        $("#searching").hide();
+        $("#pageInfo").show();
+        let total = 0,
+            showTotal = 0;
+        total = data.total;
+        showTotal = data.pageNum < data.pages ? data.pageSize * data.pageNum : total;
+        $("#total").html(total);
+        $("#showTotal").html(showTotal);
+    }
+
+    function adoptComment() {
+        let arr = getSelected();
+        if (arr.length > 1) {
+            parent.toast("该操作无法批量进行");
+            return;
+        } else if (arr.length === 0) {
+            parent.toast("请选择评论");
+            return;
+        }
+        console.log($(arr[0]));
+        let data = {
+            "id": $(arr[0]).val(),
+        };
+        console.log(data);
+        parent.showDialogModal("评论通过确认", "点击确认通过评论", "", function () {
+            $.post("/web/v1/comment/enableComment", data, function (data) {
+                if (data.code === 0) {
+                    parent.showLogModal("页面提示", "操作成功3S后刷新页面");
+                    setTimeout(function () {
+                        parent.window.location.href = "/admin/MangeHome.html";
+                    }, 3000)
+                } else {
+                    parent.showLogModal("页面提示", "操作失败: " + data.message)
+                }
+            }, "json")
+        })
+    }
+
+    function rejectComment() {
+        let arr = getSelected();
+        if (arr.length > 1) {
+            parent.toast("该操作无法批量进行");
+            return;
+        } else if (arr.length === 0) {
+            parent.toast("选项不能为空");
+            return;
+        }
+        let data = {
+            "id": $(arr[0]).val(),
+        };
+        console.log(data);
+        parent.showDialogModal("评论驳回确认", "是否删除选中法条的标签", "", function () {
+            $.post("/web/v1/comment/disableComment", data, function (data) {
+                if (data.code === 0) {
+                    parent.toast("操作成功3S后刷新页面");
+                    setTimeout(function () {
+                        parent.window.location.href = "/admin/MangeHome.html";
+                    }, 2000)
+                } else {
+                    parent.toast("操作失败: " + data.message)
+                }
+            }, "json")
+        })
+    }
+    /**
+     * 格式化日期
+     * @param {Object} dateStr 要格式化的日期字符串
+     * @param {Object} fmt 格式(例:yyyy-MM-dd hh:mm:ss 另S:毫秒,q:季度)
+     */
+    function formatDate(dateStr, fmt) {
+        if (dateStr == null || dateStr == undefined) {
+            return "-";
+        }
+        let date = new Date(dateStr);
+        let o = {
+            "M+": date.getMonth() + 1, //月份
+            "d+": date.getDate(), //日
+            "h+": date.getHours(), //小时
+            "m+": date.getMinutes(), //分
+            "s+": date.getSeconds(), //秒
+            "q+": Math.floor((date.getMonth() + 3) / 3), //季度
+            "S": date.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+</script>
+<body>
+<div id="TCase-list" class="result-box">
+    <div class="result-bar">
+        <nav class="d-flex condition-box navbar navbar-expand-sm bg-dark navbar-dark">
+            <div class="message-box">
+                <span id="searching">正在查找</span>
+                <span id="pageInfo">已显示<span id="showTotal"></span>项/共<span id="total"></span>项</span>
+            </div>
+            <div class="tool-bar">
+                <span class="fa fa-check disabled fa-other" title="通过" onclick="adoptComment()"></span>
+                <span class="fa fa-close disabled fa-other" title="驳回" onclick="rejectComment()"></span>
+            </div>
+        </nav>
+    </div>
+    <div class="result-content">
+        <table class="table table-dark table-striped table-hover table-responsive-md" id="law-list">
+            <thead>
+            <tr class="thead-light">
+                <td class="chooseAll" title="长按全选/反选" onclick="chooseAll()"><span
+                        class="check-box fa fa-square-o"></span></td>
+                <td>序号</td>
+                <td>用户</td>
+                <td>内容</td>
+                <td>申请时间</td>
+            </tr>
+            </thead>
+            <tr class="list-content border-bottom border-secondary mt-1 pb-1" v-for="(item,index) in tempRemarks">
+                <td class="itemCheckbox text-md-center" title="选择/取消" style="vertical-align: middle;"
+                    onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
+                <td style="vertical-align: middle;">{{index+1}}</td>
+                <td class="tempRemarkId">
+                    <input class="item-checkbox d-none" name="commentId" type="checkbox" :value="item.id">
+                    <input class="item-checkbox d-none" name="belong" type="hidden" :value="item.belong">
+                    <span class="">{{item.author.phoneNumber}}</span>
+                </td>
+                <td>{{item.content|subContent(50)}}</a>
+                </td>
+                <td><span class="">{{item.createTime|formatTime}}</span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="footer" class="text-center">
+        <div id="morePage" style="display: none;">
+            <span class="btn btn-secondary btn-small" onclick="getMore()">加载更多</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

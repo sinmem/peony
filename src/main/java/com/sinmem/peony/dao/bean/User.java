@@ -144,4 +144,14 @@ public class User extends BaseBean implements UserDetails {
                 ", updateTime=" + updateTime +
                 "} " + super.toString();
     }
+
+    public boolean hasRole(Role role){
+        if(this.roles==null||this.roles.isEmpty()||role==null){
+            return false;
+        }
+        for (Role item : this.roles) {
+            if(role.equals(item))return true;
+        }
+        return false;
+    }
 }

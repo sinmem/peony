@@ -1,7 +1,7 @@
 package com.sinmem.peony.common.enums;
 
 public enum Status {
-    待审核,
+    TO_BE_REVIEWED,
     /**
      * 有效的
      */

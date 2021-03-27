@@ -55,6 +55,49 @@
                 </div>
             </div>
         </div>
+        <div class="card-body">
+            <div class="card-header">
+                评论区
+            </div>
+            <div class="card-body">
+                <div class="card">
+                    <div class="card-body">
+                        <textarea placeholder="请输入评论" rows="5" id="myComment" class="card-text form-control" v-model="myComment.content" ></textarea>
+                        <button class="btn btn-primary float-right" @click="addComment()">提交</button>
+                    </div>
+                </div>
+                <div v-show="!hasComment" class="card">
+                    <div class="card-body">
+                        <div class="card-text">暂无评论</div>
+                    </div>
+                </div>
+                <div v-if="hasComment" v-for="comment in comments">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="card-title col-11">{{comment.author|authorFilter}}</div>
+                                <button class="col-1 btn btn-sm btn-light float-right" @click="reply(comment)">回复</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-text">{{comment.content}}</div>
+                            <div class="card" v-if="hasChildren(comment)"
+                                 v-for="child in comment.children">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="card-title col-11">{{child.author|authorFilter}}</div>
+                                        <button class="col-1 btn btn-sm btn-light float-right" @click="reply(child)">回复</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-text">{{child.content}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div v-show="isShow" class="card-body">
             <hr>
             <script id="editor" type="text/plain" style="width:100%;height:500px;"></script>
@@ -70,6 +113,11 @@
 
     let rVue;
     let lawId = GetQueryString("lawId");
+    const default_comment = {
+        belong: lawId,
+        content: "",
+        type: 'READING'
+    };
     $(function () {
         let user = JSON.parse(localStorage.getItem("user"));
         rVue = new Vue({
@@ -81,7 +129,13 @@
                 content: "",
                 isAppendTo: false,
                 reading: null,
-                isShow: true
+                isShow: false,
+                myComment: {
+                    belong: lawId,
+                    content: "",
+                    type: 'READING'
+                },
+                comments: []
             },
             filters: {
                 countFilter: function (count) {
@@ -112,17 +166,45 @@
                     }
                     return content;
                 },
+                authorFilter(author) {
+                    return "tel:" + author.phoneNumber
+                }
             },
             methods: {
                 showToggle() {
                     this.isShow = !this.isShow;
+                    setContent(this.reading, true);
                 },
                 sureSubmit() {
+                    console.log(getContent());
                     if (this.isAdmin && this.hasReading) {
                         sureSubmit('/web/v1/law/updReading', refresh);
                     } else {
                         sureSubmit('/web/v1/law/addReading', refresh);
                     }
+                },
+                hasChildren(comment) {
+                    return comment.children && comment.children.length > 0
+                },
+                reply(comment){
+                    console.log(comment);
+                    this.myComment.belong= comment.type==="COMMENT"?comment.belong:comment.id;
+                    this.myComment.type = "COMMENT";
+                    this.myComment.content = '@'+comment.author.phoneNumber+" ";
+                },
+                addComment() {
+                    let comment = this.myComment;
+                    console.log("addComment",comment);
+                    if (!comment.content || comment.content.length === 0) {
+                        alert("评论内容为空")
+                        return;
+                    }
+                    this.myComment = JSON.parse(JSON.stringify(default_comment));
+                    $.post("/web/v1/comment/addComment", comment, function (data) {
+                       if(data.code===0){
+                           alert("提交成功")
+                       }
+                    }, "json")
                 }
 
             },
@@ -131,7 +213,10 @@
                     return this.user.roles.includes("ROLE_ADMIN")
                 },
                 hasReading() {
-                    return this.reading ? true : false;
+                    return !!this.reading;
+                },
+                hasComment() {
+                    return this.comments && this.comments.length !== 0;
                 }
             }
         });
@@ -139,7 +224,6 @@
             rVue.law = data.content;
         }, "json");
         $.get("/web/v1/law/getReading", {"lawId": lawId}, function (data) {
-            console.log("dsada: ", data.content);
             if (data.content && data.content.content) {
 
                 if (data.content === "未获取到解读") {
@@ -151,9 +235,26 @@
                 }
             }
         }, "json");
+
+        $.get("/web/v1/comment/getComments",
+            {
+                belong: lawId,
+                status: "VALID",
+            }
+            , function (data) {
+                if (data.content && data.content) {
+                    console.log("com", data.content);
+                    if (data.content && data.content.length != 0) {
+                        rVue.comments = data.content;
+                    } else {
+                        rVue.comments = null;
+                    }
+                }
+            }, "json");
         localStorage.removeItem("lawId");
     });
     let refresh = function () {
         location.reload()
     }
+
 </script>

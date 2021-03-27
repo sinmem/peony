@@ -4,6 +4,7 @@ import com.sinmem.peony.common.enums.CommentType;
 import com.sinmem.peony.common.enums.Status;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @version V1.0
@@ -13,12 +14,30 @@ import java.util.Date;
  * @CreateTime 2021-03-19 00:28
  * @Description 各种各样的评论
  */
-public class comment extends BaseBean {
+public class CommentBean extends BaseBean {
+    private Long belong;
     private String content;
     private Date createTime;
     private User author;
     private CommentType type;
     private Status status;
+    private List<CommentBean> children;
+
+    public List<CommentBean> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<CommentBean> children) {
+        this.children = children;
+    }
+
+    public Long getBelong() {
+        return belong;
+    }
+
+    public void setBelong(Long belong) {
+        this.belong = belong;
+    }
 
     public Status getStatus() {
         return status;
