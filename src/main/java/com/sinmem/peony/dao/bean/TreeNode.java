@@ -16,6 +16,7 @@ public class TreeNode extends BaseBean {
     private String style;
     private String extra;
     private List<TreeNode> children;
+    private long parent;
 
     public String getContent() {
         return content;
@@ -47,6 +48,14 @@ public class TreeNode extends BaseBean {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public long getParent() {
+        return parent;
+    }
+
+    public void setParent(long parent) {
+        this.parent = parent;
     }
 
     public List<TreeNode> getChildren() {

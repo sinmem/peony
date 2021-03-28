@@ -4,6 +4,7 @@ import com.sinmem.peony.common.Result;
 import com.sinmem.peony.common.ResultPage;
 import com.sinmem.peony.dao.bean.LawBean;
 import com.sinmem.peony.dao.bean.TagBean;
+import com.sinmem.peony.dao.bean.TreeNode;
 import com.sinmem.peony.dao.dto.LawBriefDto;
 import com.sinmem.peony.dao.dto.LawCompleteDto;
 import com.sinmem.peony.dao.dto.TagLawsDto;
@@ -88,4 +89,8 @@ public interface LawService {
      * @param lawId
      */
     Result getSimpleLawTree(Long lawId);
+    Result getLawTree(Long id);
+    Result addLawTree(TreeNode node);
+    Result updLawTree(TreeNode node);
+    Result delLawTree(Long id);
 }

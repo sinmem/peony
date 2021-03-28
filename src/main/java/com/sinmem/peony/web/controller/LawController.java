@@ -5,6 +5,7 @@ import com.sinmem.peony.common.enums.Msg;
 import com.sinmem.peony.common.utils.GsonUtils;
 import com.sinmem.peony.dao.bean.LawBean;
 import com.sinmem.peony.dao.bean.TagBean;
+import com.sinmem.peony.dao.bean.TreeNode;
 import com.sinmem.peony.service.LawService;
 import com.sinmem.peony.service.LegalNameService;
 import com.sinmem.peony.service.TagService;
@@ -195,5 +196,22 @@ public class LawController {
     @GetMapping("/getSimpleLawTree")
     public String getSimpleLawTree(Long lawId){
         return lawService.getSimpleLawTree(lawId).toString();
+    }
+
+    @GetMapping("/getLawTree")
+    public String getLawTree(Long id){
+        return lawService.getLawTree(id).toString();
+    }
+    @PostMapping("/addLawTree")
+    public String addLawTree(TreeNode node){
+        return lawService.addLawTree(node).toString();
+    }
+    @PostMapping("/updLawTree")
+    public String updLawTree(TreeNode node){
+        return lawService.updLawTree(node).toString();
+    }
+    @GetMapping("/delLawTree")
+    public String delLawTree(Long id){
+        return lawService.delLawTree(id).toString();
     }
 }

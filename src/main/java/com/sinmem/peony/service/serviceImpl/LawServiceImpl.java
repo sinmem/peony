@@ -8,7 +8,6 @@ import com.sinmem.peony.common.enums.LawStatus;
 import com.sinmem.peony.common.enums.Msg;
 import com.sinmem.peony.common.exception.DataOperationException;
 import com.sinmem.peony.common.exception.ValidationException;
-import com.sinmem.peony.common.utils.GsonUtils;
 import com.sinmem.peony.dao.bean.LawBean;
 import com.sinmem.peony.dao.bean.LegalName;
 import com.sinmem.peony.dao.bean.TagBean;
@@ -16,11 +15,11 @@ import com.sinmem.peony.dao.bean.TreeNode;
 import com.sinmem.peony.dao.dto.LawBriefDto;
 import com.sinmem.peony.dao.dto.LawCompleteDto;
 import com.sinmem.peony.dao.dto.TagLawsDto;
+import com.sinmem.peony.dao.mapper.CatalogMapper;
 import com.sinmem.peony.dao.mapper.LawMapper;
 import com.sinmem.peony.dao.mapper.LegalNameMapper;
 import com.sinmem.peony.dao.mapper.TagMapper;
 import com.sinmem.peony.service.LawService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -49,6 +48,8 @@ public class LawServiceImpl implements LawService {
     private TagMapper tagMapper;
     @Resource
     private LegalNameMapper legalNameMapper;
+    @Resource
+    private CatalogMapper catalogMapper;
 
     @Override
     public ResultPage<LawBriefDto> searchLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
@@ -208,7 +209,59 @@ public class LawServiceImpl implements LawService {
         return Result.success(result);
     }
 
+    @Override
+    public Result getLawTree(Long lawId) {
+        return Result.success(generateLawTree());
+    }
+
+    @Override
+    public Result addLawTree(TreeNode node) {
+        Integer content = catalogMapper.addNode(node);
+        LawTree = null;
+        return Result.success(content);
+    }
+
+    @Override
+    public Result updLawTree(TreeNode node) {
+        LawTree = null;
+        return Result.success(catalogMapper.updNode(node));
+    }
+
+    @Override
+    public Result delLawTree(Long id) {
+        LawTree = null;
+        return Result.success(catalogMapper.delNode(id));
+    }
+
+    private TreeNode generateLawTree() {
+        if (LawTree == null) {
+            synchronized (LOCK){
+                if(LawTree==null){
+                    System.out.println("gdsfuilsadflusdahgo");
+                    TreeNode root = createRoot2();
+                    LawTree = root;
+                    List<TreeNode> children = getChildren(root.getId());
+                    root.setChildren(children);
+                }
+            }
+        }
+        return LawTree;
+    }
+
+    private List<TreeNode> getChildren(Long parent) {
+        List<TreeNode> children = catalogMapper.getChildren(parent);
+        if(!children.isEmpty()){
+            for (TreeNode child : children) {
+                if("catalog".equals(child.getStyle())){
+                    child.setChildren(getChildren(child.getId()));
+                }
+            }
+        }
+        return children;
+    }
+
     private TreeNode SimpleLawTree;
+    private TreeNode LawTree;
 
     private static final String LOCK = "SimpleLawTree_LOCK";
     private TreeNode getSimpleTree() {
@@ -278,6 +331,14 @@ public class LawServiceImpl implements LawService {
         root.setId(0L);
         root.setContent("民法典");
         root.setTitle("民法典");
+        return root;
+    }
+    private TreeNode createRoot2() {
+        TreeNode root = new TreeNode();
+        root.setId(0L);
+        root.setContent("民法典");
+        root.setTitle("民法典");
+        root.setStyle("catalog");
         return root;
     }
 
