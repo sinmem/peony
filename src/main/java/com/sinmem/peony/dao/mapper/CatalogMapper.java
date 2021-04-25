@@ -19,4 +19,7 @@ public interface CatalogMapper {
     @Update("UPDATE t_catalog SET content = #{node.content}, title=#{node.title}, " +
             "extra=#{node.extra} WHERE id = #{node.id}")
     Integer updNode(@Param("node") TreeNode node);
+
+    @Select("SELECT id FROM t_catalog WHERE extra LIKE CONCAT('%\"lawId\":',#{lawId},'%')")
+    Long getNodeId(@Param("lawId") Long lawId);
 }

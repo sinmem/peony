@@ -50,6 +50,10 @@ public interface LawMapper {
     public List<LawBriefDto> searchLawsOnContent(@Param("conditions") String[] conditions);
 
     @ResultMap("LawMap")
+    @SelectProvider(type = LawProvider.class, method = "searchLawsOnContent")
+    public List<LawBriefDto> searchOldLawsOnContent(@Param("conditions") String[] conditions);
+
+    @ResultMap("LawMap")
     @Select("SELECT vl.* from v_law AS vl,(SELECT law_id FROM t_tag_law WHERE tag_id = #{tagId}) AS rm WHERE rm.law_id = vl.id ORDER BY release_time desc, legal_name asc, `no` asc")
     public List<LawBriefDto> getLawsByTag(Long tagId);
 

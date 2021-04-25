@@ -16,6 +16,9 @@ public interface LegalNameMapper {
     @SelectProvider(type = LegalNameProvider.class, method = "searchLawsOnFullName")
     public List<LegalName> searchFullNames(@Param("conditions") String[] condition);
 
+    @SelectProvider(type = LegalNameProvider.class, method = "searchLawsOnFullName")
+    public List<LegalName> searchOldFullNames(@Param("conditions") String[] condition);
+
     @Select("SELECT abbreviation, full_name FROM t_legal_name WHERE id = #{id}")
     public LegalName queryLegalNameById(Long id);
 

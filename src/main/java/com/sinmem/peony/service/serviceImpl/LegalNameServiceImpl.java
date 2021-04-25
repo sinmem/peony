@@ -1,5 +1,6 @@
 package com.sinmem.peony.service.serviceImpl;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sinmem.peony.common.ResultPage;
@@ -25,7 +26,7 @@ public class LegalNameServiceImpl implements LegalNameService {
 
     @Override
     public ResultPage<LegalName> searchFullNames(Integer pageNum, Integer pageSize, String... conditions) {
-        Page<LegalName> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(()->legalNameMapper.searchFullNames(conditions));
+        Page<LegalName> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> legalNameMapper.searchFullNames(conditions));
         return new ResultPage<>(page);
     }
 }

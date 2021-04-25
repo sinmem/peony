@@ -1,5 +1,6 @@
 package com.sinmem.peony.service.serviceImpl;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sinmem.peony.common.Result;
@@ -58,7 +59,18 @@ public class LawServiceImpl implements LawService {
     }
 
     @Override
+    @DS("db1")
+    public ResultPage<LawBriefDto> searchOldLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
+        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.searchOldLawsOnContent(conditions));
+        return new ResultPage(page);
+    }
+
+    @Override
     public LawCompleteDto getLawById(Long id) {
+        return lawMapper.queryLawById(id);
+    }
+    @DS("db1")
+    public LawCompleteDto getOldLawById(Long id) {
         return lawMapper.queryLawById(id);
     }
 
@@ -211,8 +223,31 @@ public class LawServiceImpl implements LawService {
 
     @Override
     public Result getLawTree(Long lawId) {
-        return Result.success(generateLawTree());
+        TreeNode treeNode = generateLawTree();
+        Map<String, Object> map = new HashMap<>();
+        map.put("tree", treeNode);
+        Long nodeId = catalogMapper.getNodeId(lawId);
+        if(nodeId!=null){
+            List parentList = getParentList(nodeId);
+            map.put("parentList", parentList);
+        }
+        return Result.success(map);
     }
+
+    private List getParentList(Long nodeId) {
+        List<Long> result = new ArrayList();
+        getParent(nodeId, result);
+        return result;
+    }
+
+    private void getParent(Long nodeId, List<Long> result) {
+        TreeNode node = SimpleLawMap.get(nodeId);
+        result.add(node.getId());
+        if(node.getId()!=0){
+            getParent(node.getParent(), result);
+        }
+    }
+
 
     @Override
     public Result addLawTree(TreeNode node) {
@@ -241,6 +276,7 @@ public class LawServiceImpl implements LawService {
                     TreeNode root = createRoot2();
                     LawTree = root;
                     List<TreeNode> children = getChildren(root.getId());
+                    SimpleLawMap.put(root.getId(), root);
                     root.setChildren(children);
                 }
             }
@@ -252,6 +288,7 @@ public class LawServiceImpl implements LawService {
         List<TreeNode> children = catalogMapper.getChildren(parent);
         if(!children.isEmpty()){
             for (TreeNode child : children) {
+                SimpleLawMap.put(child.getId(), child);
                 if("catalog".equals(child.getStyle())){
                     child.setChildren(getChildren(child.getId()));
                 }
@@ -260,8 +297,9 @@ public class LawServiceImpl implements LawService {
         return children;
     }
 
-    private TreeNode SimpleLawTree;
+    private final Map<Long, TreeNode> SimpleLawMap = new HashMap<>();
     private TreeNode LawTree;
+    private TreeNode SimpleLawTree;
 
     private static final String LOCK = "SimpleLawTree_LOCK";
     private TreeNode getSimpleTree() {

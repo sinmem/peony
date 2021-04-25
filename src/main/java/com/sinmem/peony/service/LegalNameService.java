@@ -14,5 +14,5 @@ public interface LegalNameService {
      * @param conditions 查询关键词
      * @return 法律名称集合
      */
-    public ResultPage<LegalName> searchFullNames(Integer pageNum, Integer pageSize, String...conditions);
+    public ResultPage<LegalName> searchFullNames(Integer pageNum, Integer pageSize, String... conditions);
 }

@@ -28,6 +28,12 @@ public interface LawService {
      * @return List>BeanDto
      */
     public ResultPage<LawBriefDto> searchLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
+    /**
+     * 根据关键词在内容列搜索旧法条接口方法
+     * @param conditions
+     * @return List>BeanDto
+     */
+    public ResultPage<LawBriefDto> searchOldLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
 
     /**
      * 根据id获取完整的法条信息
@@ -35,6 +41,7 @@ public interface LawService {
      * @return
      */
     public LawCompleteDto getLawById(Long id);
+    public LawCompleteDto getOldLawById(Long id);
 
     public ResultPage<LawBriefDto> getLawsByTag(Long tagId, Integer pageNum, Integer pageSize);
 

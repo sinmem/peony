@@ -41,6 +41,7 @@
             title:"",
             style:"",
             extra:"",
+            parentList:[0],
             children:[],
         }
         $(function () {
@@ -50,7 +51,11 @@
                     remarkType: "REMARK",
                     content: "",
                     isAppendTo: false,
-                    treeData: {},
+                    parentList:{ arr:[0] },
+                    treeData: {
+                        id:0,
+                        parent:0
+                    },
                     selectLaw:{
                         id:-1,
                         content:"",
@@ -140,8 +145,10 @@
                 computed:{
                 }
             });
-            $.get("/web/v1/law/getLawTree", {"lawId": lawId}, function (data) {
-                rVue.treeData = data.content;
+            $.get("/web/v1/law/getLawTree", {"id": lawId}, function (data) {
+                console.log(data)
+                rVue.treeData = data.content.tree;
+                rVue.parentList = { arr:data.content.parentList }||{ arr:[0] };
                 console.log("catalogL: ", rVue.treeData);
             }, "json");
         });
@@ -167,7 +174,7 @@
         </div>
     </div>
     <div class="row">
-        <my-treec :item="treeData" @select-data="selectData" class="col-5"></my-treec>
+        <my-treec :item="treeData" @select-data="selectData" class="col-5" :parents="parentList"></my-treec>
         <div class="col-7">
             <button @click="del()" title="删除选中" type="submit" class="submitBtn btn btn-primary btn-block">
                 删除

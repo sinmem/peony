@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.Year;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -36,85 +35,99 @@ public class LawController {
 
     @Resource
     private LegalNameService legalNameService;
+
     /**
      * 通过关键词查找法条内容相符的法条
-     * @param pageNum 当前页
-     * @param pageSize 页面大小
+     *
+     * @param pageNum    当前页
+     * @param pageSize   页面大小
      * @param conditions 条件数组
      * @return
      */
     @GetMapping("/search/onContent")
-    public String searchOnContent(Integer pageNum, Integer pageSize, String...conditions){
-        return Result.success(lawService.searchLawsOnContent(conditions, pageNum, pageSize)).toString();
+    public String searchOnContent(Integer pageNum, Integer pageSize, Boolean isOld, String... conditions) {
+        return Result.success(isOld != null && isOld
+                ? lawService.searchOldLawsOnContent(conditions, pageNum, pageSize)
+                : lawService.searchLawsOnContent(conditions, pageNum, pageSize)
+        ).toString();
     }
 
     /**
      * 通过标签id查找法条
-     * @param pageNum 当前页
+     *
+     * @param pageNum  当前页
      * @param pageSize 页面大小
-     * @param tag 标签Id
+     * @param tag      标签Id
      * @return
      */
     @GetMapping("/getLawsByTag")
-    public String getLawsByTag(Integer pageNum, Integer pageSize, Long tag){
+    public String getLawsByTag(Integer pageNum, Integer pageSize, Long tag) {
         return Result.success(lawService.getLawsByTag(tag, pageNum, pageSize)).toString();
     }
 
     /**
      * 通过标签id集合查找法条
-     * @param pageNum 当前页
+     *
+     * @param pageNum  当前页
      * @param pageSize 页面大小
-     * @param tags 标签Id的Json字符串
+     * @param tags     标签Id的Json字符串
      * @return
      */
     @GetMapping("/getLawsByTags")
-    public String getLawsByTags(Integer pageNum, Integer pageSize, String tags){
+    public String getLawsByTags(Integer pageNum, Integer pageSize, String tags) {
         TagBean[] A = GsonUtils.fromJson(tags, TagBean[].class);
         return Result.success(lawService.getLawsByTags(A, pageNum, pageSize)).toString();
     }
 
     /**
      * 通过法律名称id查找法条
-     * @param pageNum 当前页
+     *
+     * @param pageNum  当前页
      * @param pageSize 页面大小
      * @param fullName 全称
      * @return
      */
     @GetMapping("/getLawsByFullName")
-    public String getLawsByFullName(Integer pageNum, Integer pageSize, Long fullName){
+    public String getLawsByFullName(Integer pageNum, Integer pageSize, Long fullName) {
         return Result.success(lawService.getLawsByFullName(fullName, pageNum, pageSize)).toString();
     }
 
     @GetMapping("/searchFullName")
-    public String searchFullNames(Integer pageNum, Integer pageSize, String...conditions){
+    public String searchFullNames(Integer pageNum, Integer pageSize, String... conditions) {
+
         return Result.success(legalNameService.searchFullNames(pageNum, pageSize, conditions)).toString();
     }
+
     /**
      * 通过id获取法条
+     *
      * @param lawId 法条id
      * @return
      */
     @GetMapping("/getLawById")
-    public String getLawById(Long lawId){
-        return Result.success(lawService.getLawById(lawId)).toString();
+    public String getLawById(Long lawId, Boolean isOld) {
+        return Result.success(isOld != null && isOld
+                ? lawService.getOldLawById(lawId)
+                : lawService.getLawById(lawId)).toString();
     }
 
 
     /**
      * 通过要查询的标签id和本条法条id查询忽略本法条的含有给定标签id的
      * 法条(排除标签查找时候已经显示出的标签id不就行查找)
-     * @param pageNum 当前页
+     *
+     * @param pageNum  当前页
      * @param pageSize 页面大小
-     * @param thisTag 要查找的标签id
-     * @param thisLaw 本条法条id
-     * @param showTag 已进行搜索显示的标签id
+     * @param thisTag  要查找的标签id
+     * @param thisLaw  本条法条id
+     * @param showTag  已进行搜索显示的标签id
      * @return
      */
     @GetMapping("/getThisTagOthers")
-    public String getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw,  Long...showTag){
-        if(showTag!=null){
+    public String getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw, Long... showTag) {
+        if (showTag != null) {
             for (Long tag : showTag) {
-                if(thisTag.equals(tag)){
+                if (thisTag.equals(tag)) {
                     return Result.error(Msg.E21002).setMessage("所查询数据已呈现").toString();
                 }
             }
@@ -125,18 +138,19 @@ public class LawController {
     /**
      * 通过要查询的标签id和本条法条id查询忽略本法条的含有给定标签id的
      * 法条(排除标签查找时候已经显示出的标签id不就行查找)
-     * @param pageNum 当前页
+     *
+     * @param pageNum  当前页
      * @param pageSize 页面大小
-     * @param thisTag 要查找的标签id
-     * @param thisLaw 本条法条id
-     * @param showTag 已进行搜索显示的标签id
+     * @param thisTag  要查找的标签id
+     * @param thisLaw  本条法条id
+     * @param showTag  已进行搜索显示的标签id
      * @return
      */
     @GetMapping("/getThisTagOthers2")
-    public String getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw,  Long...showTag){
-        if(showTag!=null){
+    public String getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw, Long... showTag) {
+        if (showTag != null) {
             for (Long tag : showTag) {
-                if(thisTag.equals(tag)){
+                if (thisTag.equals(tag)) {
                     return Result.error(Msg.E21002).setMessage("所查询数据已呈现").toString();
                 }
             }
@@ -146,72 +160,79 @@ public class LawController {
 
     /**
      * 修改法条, 同时将旧的法条状态修改为"被修改的"
-     * @param newLaw 新的法条
+     *
+     * @param newLaw  新的法条
      * @param oldLaws 旧法条id数组
      * @return 操作状态
      */
     @PostMapping("/modifyLaws")
-    public String modifyLaws(LawBean newLaw, Long[] oldLaws){
-        System.out.println("oldLaws: "+ Arrays.toString(oldLaws));
+    public String modifyLaws(LawBean newLaw, Long[] oldLaws) {
+        System.out.println("oldLaws: " + Arrays.toString(oldLaws));
         return lawService.modifyLaws(newLaw, Year.parse("2000"), oldLaws).toString();
     }
 
     /**
      * 修改法条,同时将旧的法条改为"无效的"
-     * @param newLaw 新法条
+     *
+     * @param newLaw  新法条
      * @param oldLaws 旧法条id数组
      * @return 操作状态
      */
     @PostMapping("/reviseLaws")
-    public String reviseLaws(LawBean newLaw, Long[] oldLaws){
-        System.out.println("oldLaws: "+ Arrays.toString(oldLaws));
+    public String reviseLaws(LawBean newLaw, Long[] oldLaws) {
+        System.out.println("oldLaws: " + Arrays.toString(oldLaws));
         return lawService.reviseLaws(newLaw, Year.parse("2000"), oldLaws).toString();
     }
 
     /**
      * 通过当前法条Id搜索与之有关的新法条
+     *
      * @param thisLawId 当前法条Id
      * @return 之有关的新法条
      */
     @GetMapping("/getNewLaw")
-    public String getNewLaw(Long thisLawId){
+    public String getNewLaw(Long thisLawId) {
         return lawService.getNewLaw(thisLawId).toString();
     }
 
     /**
      * 通过当前Id获取与之有关的旧法条
+     *
      * @param thisLawId 当前法条Id
      * @return 与之有关的旧法条
      */
     @GetMapping("/getOldLaws")
-    public String getOldLaws(Long thisLawId){
+    public String getOldLaws(Long thisLawId) {
         return lawService.getOldLaws(thisLawId).toString();
     }
 
     @GetMapping("/getLegals")
-    public String getLegals(){
+    public String getLegals() {
         return lawService.getLegals().toString();
     }
 
     @GetMapping("/getSimpleLawTree")
-    public String getSimpleLawTree(Long lawId){
+    public String getSimpleLawTree(Long lawId) {
         return lawService.getSimpleLawTree(lawId).toString();
     }
 
     @GetMapping("/getLawTree")
-    public String getLawTree(Long id){
+    public String getLawTree(Long id) {
         return lawService.getLawTree(id).toString();
     }
+
     @PostMapping("/addLawTree")
-    public String addLawTree(TreeNode node){
+    public String addLawTree(TreeNode node) {
         return lawService.addLawTree(node).toString();
     }
+
     @PostMapping("/updLawTree")
-    public String updLawTree(TreeNode node){
+    public String updLawTree(TreeNode node) {
         return lawService.updLawTree(node).toString();
     }
+
     @GetMapping("/delLawTree")
-    public String delLawTree(Long id){
+    public String delLawTree(Long id) {
         return lawService.delLawTree(id).toString();
     }
 }

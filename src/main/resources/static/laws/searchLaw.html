@@ -21,6 +21,7 @@
             if (r != null) return decodeURI(r[2]);
             return null;
         }
+
         function getNewLaw(el) {
             let id = $(el).parents(".list-content").find(".item-checkbox").val();
             $.get("/web/v1/law/getNewLaw", {thisLawId: id}, function (data) {
@@ -99,8 +100,9 @@
             lawVue = new Vue({
                 el: "#content",
                 data: {
+                    isOld: false,
                     usr: {},
-                    legalName:legalName,
+                    legalName: legalName,
                     conditionList: [],
                     fullName: 0,
                     tag: 0,
@@ -169,13 +171,14 @@
                 },
                 methods: {
                     toRemark: function (id) {
-                        window.location.href = 'remark.html?lawId=' + id;
+                        window.location.href = `remark.html?lawId=${id}&isOld=${lawVue.isOld}`;
                     },
-                    toReading:function(id){
-                        window.location.href = 'reading.html?lawId=' + id;
+                    toReading: function (id) {
+                        window.location.href = `reading.html?lawId=${id}&isOld=${lawVue.isOld}`;
                     }
                 }
             });
+            lawVue.isOld = false;
             legalVue = new Vue({
                 el: "#LegalModal",
                 data: {
@@ -426,40 +429,44 @@
         <div class="row text-center">
             <div class="col-9">
                 <ul id="search-tool-bar" class="d-inline-flex p-md-3 nav nav-pills" style="min-width: 640px">
+<!--                    <li class="p-1 nav-item">-->
+<!--                        <a class="nav-link active" data-toggle="pill" onclick="changeType(1)" href="#sFullName">全称搜索</a>-->
+<!--                    </li>-->
                     <li class="p-1 nav-item">
-                        <a class="nav-link active" data-toggle="pill" onclick="changeType(1)" href="#sFullName">全称搜索</a>
-                    </li>
-                    <li class="p-1 nav-item">
-                        <a class="nav-link" data-toggle="pill" onclick="changeType(2)" href="#sContent">关键词搜索</a>
-                    </li>
-                    <li class="p-1 nav-item">
-                        <a class="nav-link" data-toggle="pill" onclick="changeType(3)" href="#sTags">标签查找</a>
+                        <a class="nav-link active" data-toggle="pill" onclick="changeType(2)" href="#sContent">新法关键词搜索</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link" data-toggle="pill" onclick="window.location.href = 'legalTags.html'"
-                           href="#tagList">全部标签</a>
+                        <a class="nav-link" data-toggle="pill" onclick="changeType(2, true)" href="#sContent">旧法关键词搜索</a>
                     </li>
-                    <li class="p-1 nav-item">
-                        <a class="nav-link" data-toggle="pill"
-                           onclick="window.location.href = '../admin/MangeHome.html'" href="#tagList">管理</a>
-                    </li>
-                    <li class="p-1 nav-item">
-                        <a class="nav-link" data-toggle="pill"
-                           onclick="window.location.href = '/toc.html'" href="#tagList">目录</a>
-                    </li>
-                    <li id="xxx" title="切换搜索类型时保留搜索关键词">
-                        <input type="checkbox" class="saveCondition" name="saveCondition"/>
-                        <span id="saveTheCondition">保留关键字</span>
-                    </li>
+                    <!--                    <li class="p-1 nav-item">-->
+                    <!--                        <a class="nav-link" data-toggle="pill" onclick="changeType(3)" href="#sTags">标签查找</a>-->
+                    <!--                    </li>-->
+<!--                    <li class="p-1 nav-item">-->
+<!--                        <a class="nav-link" data-toggle="pill" onclick="window.location.href = 'legalTags.html'"-->
+<!--                           href="#tagList">全部标签</a>-->
+<!--                    </li>-->
+                    <!--                    <li class="p-1 nav-item">-->
+                    <!--                        <a class="nav-link" data-toggle="pill"-->
+                    <!--                           onclick="window.location.href = '../admin/MangeHome.html'" href="#tagList">管理</a>-->
+                    <!--                    </li>-->
+                    <!--                    <li class="p-1 nav-item">-->
+                    <!--                        <a class="nav-link" data-toggle="pill"-->
+                    <!--                           onclick="window.location.href = '/toc.html'" href="#tagList">目录</a>-->
+                    <!--                    </li>-->
+                    <!--                    <li id="xxx" title="切换搜索类型时保留搜索关键词">-->
+                    <!--                        <input type="checkbox" class="saveCondition" name="saveCondition"/>-->
+                    <!--                        <span id="saveTheCondition">保留关键字</span>-->
+                    <!--                    </li>-->
                 </ul>
             </div>
             <div class="col-md-2 mt-4">
-                <a href="../user/member-center.html"><i class="fa fa-user">{{usr.username|usrNameFilter(usr.phoneNumber)}}</i></a>
+                <a href="../user/member-center.html"><i
+                        class="fa fa-user">{{usr.username|usrNameFilter(usr.phoneNumber)}}</i></a>
                 <a href="/logout" v-if="usr.phoneNumber">[退出]</a>
             </div>
         </div>
         <div id="search-box" class="tab-content container">
-            <form class="tab-pane active container form-inline row" id="sFullName" onsubmit="return false;">
+            <form class="tab-pane container form-inline row" id="sFullName" onsubmit="return false;">
                 <span class="ml-5"></span>
                 <div class="input-group col">
                     <input class="search-input form-control" autofocus name="conditions"
@@ -470,7 +477,7 @@
                 </div>
                 <span class="ml-5"></span>
             </form>
-            <form class="tab-pane container form-inline row" id="sContent" onsubmit="return false;">
+            <form class="tab-pane active container form-inline row" id="sContent" onsubmit="return false;">
                 <span class="ml-5"></span>
                 <div class="input-group col">
                     <input class="search-input form-control" name="conditions" placeholder="请输入内容关键词,将在法条内容中进行匹配">
@@ -543,7 +550,7 @@
                             <li class="Legal-name list-group-item list-group-item-action"
                                 v-for="(item,index) in fullNameList" onclick="showLawsByFullName(this)">
                                 <input type="hidden" name="fullNameId" :value="item.id">
-                                <span class="pointer">{{index+1}}. {{item.fullName}}</span>
+                                <span class="pointer">{{index + 1}}. {{item.fullName}}</span>
 
                                 <span class="law-content">({{item.count|countFilter}})</span>
                             </li>
@@ -574,7 +581,7 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="tagId" :value="item.id">
-                                <span class="pointer"> {{index+1}}. {{item.name}}</span>
+                                <span class="pointer"> {{index + 1}}. {{item.name}}</span>
                                 <span class="law-content">({{item.count|countFilter}})</span>
                             </li>
                         </div>
@@ -594,7 +601,7 @@
                         :class="{INVALID: item.status == 'INVALID',MODIFIED: item.status == 'MODIFIED'}">
                         <td class="itemCheckbox" title="选择/取消" style="vertical-align: middle;"
                             onclick="checkedThis(this, event)"><span class="check-box fa fa-square-o"></span></td>
-                        <td style="vertical-align: middle;">{{index+1}}</td>
+                        <td style="vertical-align: middle;">{{index + 1}}</td>
                         <td class="content-box">
                             <input class="item-checkbox d-none" name="lawIds" type="checkbox" :value="item.id">
                             <h5 class="Legal-name">
@@ -608,9 +615,12 @@
                             <span class="release-time">发布时间: {{item.releaseTime.year}}</span>
                             <div class="mr-lg-1">
                                 <div class="">
-                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-newspaper-o" @click="toRemark(item.id)">法条全景</span>
+                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-newspaper-o"
+                                                                                           @click="toRemark(item.id)">法条全景</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-object-group" @click="toReading(item.id)">法条解读</span></button>
+                                    <button class="btn btn-sm btn-outline-secondary"><span class="fa fa-object-group"
+                                                                                           @click="toReading(item.id)">法条解读</span>
+                                    </button>
                                 </div>
                             </div>
                         </td>
@@ -623,7 +633,7 @@
                         <div class="content-box">获取标签名为: "{{otherLawPage.tagName}}"
                             的其他标签结果-(共{{otherLawPage.total}}条/已显示
                             {{(otherLawPage.pageNum <
-                            otherLawPage.pages)?otherLawPage.pageNum*otherLawPage.pageSize:otherLawPage.total}}条)
+                                    otherLawPage.pages) ? otherLawPage.pageNum * otherLawPage.pageSize : otherLawPage.total}}条)
                             <span id="colse-ohterTag-laws" style="cursor: pointer;" class="fa fa-close float-right"
                                   onclick="closeOTL()"></span>
                         </div>
@@ -822,7 +832,8 @@
                     <div class="card-body" v-for="law in laws">
                         <h4 class="card-text">
                             {{law.fullName}}
-                            <span class="card-text badge badge-pill badge-secondary" style="font-size: 10px;">发布时间: {{law.releaseTime.year}}</span>
+                            <span class="card-text badge badge-pill badge-secondary"
+                                  style="font-size: 10px;">发布时间: {{law.releaseTime.year}}</span>
                         </h4>
                         <div class="card-text">{{law.content}}</div>
                     </div>
@@ -842,7 +853,7 @@
 <script>
     let oldValue = "",// 旧条件
         oldType = 0,// 旧条件类型
-        currentType = 1,// 当前条件类型
+        currentType = 2,// 当前条件类型
         conditions = [],// 条件列表
         byTypeFlage = false;//导航栏搜索按钮识别
     conditionType = {
@@ -892,7 +903,10 @@
         lawVue.currentType = 2;
         showSearch();
         $.get(lawVue.actionURL,
-            {"conditions": conditions.toString()},
+            {
+                "conditions": conditions.toString(),
+                isOld:lawVue.isOld,
+            },
             function (data) {
                 oldValue = curretnValue;
                 // 60秒后删除旧值
@@ -924,7 +938,10 @@
         lawVue.currentType = 1;
         showSearch();
         $.get(lawVue.actionURL,
-            {"conditions": conditions.toString()},
+            {
+                "conditions": conditions.toString(),
+
+            },
             function (data) {
                 oldValue = curretnValue;
                 // 60秒后删除旧值
@@ -1035,7 +1052,8 @@
         }
     }
 
-    function changeType(type) {
+    function changeType(type, isOld) {
+        lawVue.isOld = isOld;
         if (currentType == type)
             return;
         currentType = type;

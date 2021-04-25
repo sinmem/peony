@@ -1,3 +1,13 @@
+function containArr(id, arr) {
+    if (!arr) return false;
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === id) {
+            return true;
+        }
+    }
+    return false;
+}
+
 var myTreec = Vue.component("my-treec",
     {
         template: '<li :class="" style="cursor:pointer;">\n' +
@@ -14,42 +24,73 @@ var myTreec = Vue.component("my-treec",
             '                        v-for="(child, index) in item.children"\n' +
             '                        :key="index"\n' +
             '                        :item="child"\n' +
+            '                        :parents="getParents"\n' +
             '                        @select-data="$emit(\'select-data\', $event)"\n' +
             // '                        @add-item="$emit(\'add-item\', $event)"\n' +
             '                ></my-treec>\n' +
             '            </ul>\n' +
             '        </li>',
         data: function () {
+            if (containArr(this.item.id, this.parents.arr)) {
+                return {
+                    isOpen: true,
+                };
+            } else if (!this.parents.arr) {
+                if (this.item.parent === 0 || (this.item.style === "catalog" && (this.item.extra === "catalog1" || this.item.extra === "catalog2"))) {
+                    return {
+                        isOpen: true,
+                    };
+                }
+            }
             return {
-                isOpen: true,
+                isOpen: false,
             };
+
         },
         props: {
             item: {
                 type: Object,
                 default: function () {
-                    return {}
+                    return {};
+                }
+            },
+            parents: {
+                type: Object,
+                default: function () {
+                    return {
+                        arr: []
+                    };
                 }
             }
         },
         computed: {
+            getParents() {
+                return this.parents;
+            },
             isFolder: function () {
                 return this.item.style === "catalog";
             },
-            getClass:function () {
-                return this.item.myclass+(this.isFolder?" bold":"");
+            getClass: function () {
+                return this.item.myclass + (this.isFolder ? " bold" : "");
             },
-            getTitle:function () {
-                return this.item.title?this.item.title:"";
+            getTitle: function () {
+                return this.item.title ? this.item.title : "";
+            },
+            _lawId: function () {
+                let extra = this.item.extra;
+                if (extra && extra.trim().length > 0) {
+                    let extraJson = JSON.parse(extra);
+                    return extraJson.lawId || -1;
+                }
+                return -1;
             }
         },
         methods: {
             toggle: function () {
                 if (this.isFolder) {
                     this.isOpen = !this.isOpen;
-                }else if(this.item.extra==="Legal"){
-                    console.log(encodeURI(this.item.title));
-                    window.open('remark.html?lawId=' + this.item.id);
+                } else if (this.item.style === "law") {
+                    window.open('remark.html?lawId=' + this._lawId);
                 }
                 this.$emit("select-data", this.item);
             },

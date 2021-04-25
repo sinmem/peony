@@ -123,6 +123,7 @@
         rVue = new Vue({
             el: "#content",
             data: {
+                isOld:GetQueryString("isOld"),
                 law: "",
                 user: user,
                 remarkType: "REMARK",
@@ -223,7 +224,7 @@
                 }
             }
         });
-        $.get("/web/v1/law/getLawById", {"lawId": lawId}, function (data) {
+        $.get("/web/v1/law/getLawById", {"lawId": lawId,isOld:rVue.isOld}, function (data) {
             rVue.law = data.content;
         }, "json");
         $.get("/web/v1/law/getReading", {"lawId": lawId}, function (data) {
