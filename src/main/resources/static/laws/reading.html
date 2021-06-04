@@ -8,8 +8,8 @@
     <link href="./../plugins/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="./../plugins/fontAwesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
-    <!--    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
     <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
     <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="../js/popup.js" type="text/javascript"></script>
@@ -123,7 +123,7 @@
         rVue = new Vue({
             el: "#content",
             data: {
-                isOld:GetQueryString("isOld"),
+                lawType:GetQueryString("lawType"),
                 law: "",
                 user: user,
                 remarkType: "REMARK",
@@ -224,7 +224,7 @@
                 }
             }
         });
-        $.get("/web/v1/law/getLawById", {"lawId": lawId,isOld:rVue.isOld}, function (data) {
+        $.get("/web/v1/law/getLawById", {"lawId": lawId,lawType:rVue.lawType}, function (data) {
             rVue.law = data.content;
         }, "json");
         $.get("/web/v1/law/getReading", {"lawId": lawId}, function (data) {

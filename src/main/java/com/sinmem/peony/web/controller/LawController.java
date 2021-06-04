@@ -41,15 +41,25 @@ public class LawController {
      *
      * @param pageNum    当前页
      * @param pageSize   页面大小
+     * @param lawType
      * @param conditions 条件数组
      * @return
      */
     @GetMapping("/search/onContent")
-    public String searchOnContent(Integer pageNum, Integer pageSize, Boolean isOld, String... conditions) {
-        return Result.success(isOld != null && isOld
-                ? lawService.searchOldLawsOnContent(conditions, pageNum, pageSize)
-                : lawService.searchLawsOnContent(conditions, pageNum, pageSize)
-        ).toString();
+    public String searchOnContent(Integer pageNum, Integer pageSize, Integer lawType, String... conditions) {
+        switch (lawType) {
+            case 5:
+                return Result.success(lawService.searchXFLawsOnContent(conditions, pageNum, pageSize)).toString();
+            case 4:
+                return Result.success(lawService.searchXSFLawsOnContent(conditions, pageNum, pageSize)).toString();
+            case 3:
+                return Result.success(lawService.searchMSFLawsOnContent(conditions, pageNum, pageSize)).toString();
+            case 2:
+                return Result.success(lawService.searchOldLawsOnContent(conditions, pageNum, pageSize)).toString();
+            case 1:
+            default:
+                return Result.success(lawService.searchLawsOnContent(conditions, pageNum, pageSize)).toString();
+        }
     }
 
     /**
@@ -105,10 +115,20 @@ public class LawController {
      * @return
      */
     @GetMapping("/getLawById")
-    public String getLawById(Long lawId, Boolean isOld) {
-        return Result.success(isOld != null && isOld
-                ? lawService.getOldLawById(lawId)
-                : lawService.getLawById(lawId)).toString();
+    public String getLawById(Long lawId, Integer lawType) {
+        switch (lawType) {
+            case 5:
+                return Result.success(lawService.getXFLawById(lawId)).toString();
+            case 4:
+                return Result.success(lawService.getXSFLawById(lawId)).toString();
+            case 3:
+                return Result.success(lawService.getMSFLawById(lawId)).toString();
+            case 2:
+                return Result.success(lawService.getOldLawById(lawId)).toString();
+            case 1:
+            default:
+                return Result.success(lawService.getLawById(lawId)).toString();
+        }
     }
 
 
@@ -147,7 +167,7 @@ public class LawController {
      * @return
      */
     @GetMapping("/getThisTagOthers2")
-    public String getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw, Long... showTag) {
+    public String getThisTagOthers2(Integer pageNum, Integer pageSize,Integer lawType, Long thisTag, Long thisLaw, Long... showTag) {
         if (showTag != null) {
             for (Long tag : showTag) {
                 if (thisTag.equals(tag)) {
@@ -155,7 +175,7 @@ public class LawController {
                 }
             }
         }
-        return Result.success(lawService.getThisTagOthers2(pageNum, pageSize, thisTag, thisLaw)).toString();
+        return Result.success(lawService.getThisTagOthers2(pageNum, pageSize, thisTag, thisLaw, lawType)).toString();
     }
 
     /**
@@ -217,22 +237,22 @@ public class LawController {
     }
 
     @GetMapping("/getLawTree")
-    public String getLawTree(Long id) {
-        return lawService.getLawTree(id).toString();
+    public String getLawTree(Long id, Integer lawType) {
+        return lawService.getLawTree(id, lawType).toString();
     }
 
     @PostMapping("/addLawTree")
-    public String addLawTree(TreeNode node) {
-        return lawService.addLawTree(node).toString();
+    public String addLawTree(TreeNode node, Integer lawType) {
+        return lawService.addLawTree(node, lawType).toString();
     }
 
     @PostMapping("/updLawTree")
-    public String updLawTree(TreeNode node) {
-        return lawService.updLawTree(node).toString();
+    public String updLawTree(TreeNode node, Integer lawType) {
+        return lawService.updLawTree(node,lawType).toString();
     }
 
     @GetMapping("/delLawTree")
-    public String delLawTree(Long id) {
-        return lawService.delLawTree(id).toString();
+    public String delLawTree(Long id, Integer lawType) {
+        return lawService.delLawTree(id, lawType).toString();
     }
 }

@@ -33,7 +33,25 @@ public interface LawService {
      * @param conditions
      * @return List>BeanDto
      */
-    public ResultPage<LawBriefDto> searchOldLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
+    ResultPage<LawBriefDto> searchOldLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
+    /**
+     * 根据关键词在内容列搜索民诉法接口方法
+     * @param conditions
+     * @return List>BeanDto
+     */
+    ResultPage<LawBriefDto> searchMSFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
+    /**
+     * 根据关键词在内容列搜索刑诉法接口方法
+     * @param conditions
+     * @return List>BeanDto
+     */
+    ResultPage<LawBriefDto> searchXSFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
+    /**
+     * 根据关键词在内容列搜索刑法接口方法
+     * @param conditions
+     * @return List>BeanDto
+     */
+    ResultPage<LawBriefDto> searchXFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize);
 
     /**
      * 根据id获取完整的法条信息
@@ -41,7 +59,10 @@ public interface LawService {
      * @return
      */
     public LawCompleteDto getLawById(Long id);
-    public LawCompleteDto getOldLawById(Long id);
+    LawCompleteDto getOldLawById(Long id);
+    LawCompleteDto getMSFLawById(Long id);
+    LawCompleteDto getXSFLawById(Long id);
+    LawCompleteDto getXFLawById(Long id);
 
     public ResultPage<LawBriefDto> getLawsByTag(Long tagId, Integer pageNum, Integer pageSize);
 
@@ -57,7 +78,7 @@ public interface LawService {
     public List<TagLawsDto> getLawsByTags(TagBean[] tags, Integer pageNum, Integer pageSize);
 
     public ResultPage<LawBriefDto> getThisTagOthers(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw);
-    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw);
+    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw, Integer lawType);
 
     /**
      * 修改法条, 同时将旧的法条状态修改为"被修改的"
@@ -96,8 +117,8 @@ public interface LawService {
      * @param lawId
      */
     Result getSimpleLawTree(Long lawId);
-    Result getLawTree(Long id);
-    Result addLawTree(TreeNode node);
-    Result updLawTree(TreeNode node);
-    Result delLawTree(Long id);
+    Result getLawTree(Long lawId, Integer lawType);
+    Result addLawTree(TreeNode node, Integer lawType);
+    Result updLawTree(TreeNode node, Integer lawType);
+    Result delLawTree(Long id, Integer lawType);
 }

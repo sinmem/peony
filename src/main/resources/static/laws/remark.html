@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>法条全景</title>
     <script src="./../plugins/jquery/3.3.1/jquery.min.js"></script>
-    <!--    <script src="./../plugins/vue/2.2.2/vue.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="./../plugins/vue/2.2.2/vue.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
     <script src="./../plugins/popper/1.15.0/umd/popper.min.js"></script>
     <script src="./../plugins/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="./../plugins/bootstrap/bootstrap-switch.js"></script>
@@ -80,7 +80,7 @@
             rVue = new Vue({
                 el: "#content",
                 data: {
-                    isOld:GetQueryString("isOld"),
+                    lawType:GetQueryString("lawType"),
                     law: {
                         legalTags:[
                             {
@@ -144,10 +144,10 @@
                 },
                 methods: {
                     toRemark: function (id) {
-                        window.location.href = `remark.html?lawId=${id}&isOld=${lawVue.isOld}`;
+                        window.location.href = `remark.html?lawId=${id}&lawType=${lawVue.lawType}`;
                     },
                     toReading:function(id){
-                        window.location.href = `reading.html?lawId=${id}&isOld=${lawVue.isOld}`;
+                        window.location.href = `reading.html?lawId=${id}&lawType=${lawVue.lawType}`;
                     },
                     addTag: function (id) {
                         dialog = $("#TagModal .modal-dialog");
@@ -162,7 +162,8 @@
                                     thisTag:tag.id,
                                     thisLaw:lawId,
                                     showTag:[],
-                                    pageSize:0
+                                    pageSize:0,
+                                    lawType:this.lawType,
                                 };
                                 $this = this;
                                 $.get("/web/v1/law/getThisTagOthers2", param, function (data) {
@@ -187,7 +188,7 @@
                 }
             });
 
-            $.get("/web/v1/law/getLawById", {"lawId": lawId,isOld:rVue.isOld}, function (data) {
+            $.get("/web/v1/law/getLawById", {"lawId": lawId,lawType:rVue.lawType}, function (data) {
                 console.log("law",data);
                 rVue.law = data.content;
                 showbuttom();
@@ -196,7 +197,7 @@
             //     rVue.treeData = data.content.legal;
             //     showbuttom();
             // }, "json");
-            $.get("/web/v1/law/getLawTree", {"id": lawId}, function (data) {
+            $.get("/web/v1/law/getLawTree", {"id": lawId,lawType:rVue.lawType}, function (data) {
                 console.log(data)
                 rVue.treeData = data.content.tree;
                 rVue.parentList = { arr:data.content.parentList }||{ arr:[0] };

@@ -99,126 +99,126 @@
     </dependencies>
 
     <build>
-                <resources>
-                    <resource>
-                        <directory>src/main/java</directory>
-                        <includes>
-                            <include>**/*.properties</include>
-                            <include>**/*.xml</include>
-                        </includes>
-                        <filtering>true</filtering>
-                    </resource>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                        <!--排除配置文件-->
-                        <excludes>
-                            <exclude>**/*.properties</exclude>
-                            <exclude>**/*.xml</exclude>
-                            <exclude>**/*.yml</exclude>
-                        </excludes>
-                        <filtering>false</filtering>
-                    </resource>
-                </resources>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!--排除配置文件-->
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.yml</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
 
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    &lt;!&ndash;配置主类&ndash;&gt;-->
-<!--                    <mainClass>com.sinmem.peony.PeonyApplication</mainClass>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <!--            <plugin>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    &lt;!&ndash;配置主类&ndash;&gt;-->
+            <!--                    <mainClass>com.sinmem.peony.PeonyApplication</mainClass>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
 
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <source>1.8</source>
-                                <target>1.8</target>
-                                <fork>true</fork>
-                                <skip>true</skip>
-                                <executable>
-                                    E:/Java/jdk1.8.0_191/bin/javac.exe
-                                </executable>
-                            </configuration>
-                        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <fork>true</fork>
+                    <skip>true</skip>
+                    <executable>
+                        E:/Java/jdk1.8.0_191/bin/javac.exe
+                    </executable>
+                </configuration>
+            </plugin>
 
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jar-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifest>
-                                        <addClasspath>true</addClasspath>
-                                        <classpathPrefix>lib/</classpathPrefix>
-                                        <useUniqueVersions>false</useUniqueVersions>
-                                        <mainClass>com.sinmem.peony.PeonyApplication</mainClass>
-                                    </manifest>
-                                    <manifestEntries>
-                                        <Class-Path>./</Class-Path>
-                                    </manifestEntries>
-                                </archive>
-                                <excludes>
-                                    <exclude>**/*.properties</exclude>
-                                    <exclude>**/*.xml</exclude>
-                                    <exclude>**/*.yml</exclude>
-                                    <exclude>static/**</exclude>
-            <!--                        <exclude>static/bootstrap/**</exclude>-->
-            <!--                        <exclude>static/js/**</exclude>-->
-            <!--                        <exclude>static/font-awesome/**</exclude>-->
-            <!--                        <exclude>static/css/**</exclude>-->
-            <!--                        <exclude>static/ueditor/**</exclude>-->
-                                    <exclude>templates/**</exclude>
-                                    <exclude>config/**</exclude>
-                                </excludes>
-                            </configuration>
-                        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>../lib/</classpathPrefix>
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <mainClass>com.sinmem.peony.PeonyApplication</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>./</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                    <excludes>
+                        <exclude>**/*.properties</exclude>
+                        <exclude>**/*.xml</exclude>
+                        <exclude>**/*.yml</exclude>
+                        <exclude>static/**</exclude>
+                        <!--                        <exclude>static/bootstrap/**</exclude>-->
+                        <!--                        <exclude>static/js/**</exclude>-->
+                        <!--                        <exclude>static/font-awesome/**</exclude>-->
+                        <!--                        <exclude>static/css/**</exclude>-->
+                        <!--                        <exclude>static/ueditor/**</exclude>-->
+                        <exclude>templates/**</exclude>
+                        <exclude>config/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
 
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-dependency-plugin</artifactId>
-                            <executions>
-                                <execution>
-                                    <id>copy-dependencies</id>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>copy-dependencies</goal>
-                                    </goals>
-                                    <configuration>
-                                        <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                        <excludeTransitive>false</excludeTransitive>
-                                        <stripVersion>false</stripVersion>
-                                        <includeScope>runtime</includeScope>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <excludeTransitive>false</excludeTransitive>
+                            <stripVersion>false</stripVersion>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!--            &lt;!&ndash;用于赋值指定资源到指定位置&ndash;&gt;-->
-                        <plugin>
-                            <artifactId>maven-resources-plugin</artifactId>
-                            <executions>
-                                <execution> <!-- 复制配置文件 -->
-                                    <id>copy-resources</id>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>copy-resources</goal>
-                                    </goals>
-                                    <configuration>
-                                        <resources>
-                                            <resource>
-                                                <directory>src/main/resources</directory>
-                                                <includes>
-                                                    <include>static/**</include>
-                                                </includes>
-                                            </resource>
-                                        </resources>
-                                        <outputDirectory>${project.build.directory}/static/slr</outputDirectory>
-                                    </configuration>
-                                </execution>
-                            </executions>
-                        </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution> <!-- 复制配置文件 -->
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>static/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/static/slr</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

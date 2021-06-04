@@ -21,6 +21,8 @@ import com.sinmem.peony.dao.mapper.LawMapper;
 import com.sinmem.peony.dao.mapper.LegalNameMapper;
 import com.sinmem.peony.dao.mapper.TagMapper;
 import com.sinmem.peony.service.LawService;
+import com.sinmem.peony.service.LawTreeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -51,6 +53,8 @@ public class LawServiceImpl implements LawService {
     private LegalNameMapper legalNameMapper;
     @Resource
     private CatalogMapper catalogMapper;
+    @Autowired
+    private LawTreeService lawTreeService;
 
     @Override
     public ResultPage<LawBriefDto> searchLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
@@ -59,8 +63,29 @@ public class LawServiceImpl implements LawService {
     }
 
     @Override
-    @DS("db1")
+    @DS("OldL")
     public ResultPage<LawBriefDto> searchOldLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
+        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.searchOldLawsOnContent(conditions));
+        return new ResultPage(page);
+    }
+
+    @Override
+    @DS("MSFL")
+    public ResultPage<LawBriefDto> searchMSFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
+        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.searchOldLawsOnContent(conditions));
+        return new ResultPage(page);
+    }
+
+    @Override
+    @DS("XSFL")
+    public ResultPage<LawBriefDto> searchXSFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
+        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.searchOldLawsOnContent(conditions));
+        return new ResultPage(page);
+    }
+
+    @Override
+    @DS("XFL")
+    public ResultPage<LawBriefDto> searchXFLawsOnContent(String[] conditions, Integer pageNum, Integer pageSize) {
         Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.searchOldLawsOnContent(conditions));
         return new ResultPage(page);
     }
@@ -69,8 +94,26 @@ public class LawServiceImpl implements LawService {
     public LawCompleteDto getLawById(Long id) {
         return lawMapper.queryLawById(id);
     }
-    @DS("db1")
+    @DS("OldL")
     public LawCompleteDto getOldLawById(Long id) {
+        return lawMapper.queryLawById(id);
+    }
+
+    @Override
+    @DS("MSFL")
+    public LawCompleteDto getMSFLawById(Long id) {
+        return lawMapper.queryLawById(id);
+    }
+
+    @Override
+    @DS("XSFL")
+    public LawCompleteDto getXSFLawById(Long id) {
+        return lawMapper.queryLawById(id);
+    }
+
+    @Override
+    @DS("XFL")
+    public LawCompleteDto getXFLawById(Long id) {
         return lawMapper.queryLawById(id);
     }
 
@@ -155,9 +198,21 @@ public class LawServiceImpl implements LawService {
         return new ResultPage(page);
     }
     @Override
-    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw) {
-        Page<LawBriefDto> page = PageHelper.startPage(pageNum, pageSize).doSelectPage(() -> lawMapper.getThisTagOthers2(thisTag, thisLaw));
-        return new ResultPage(page);
+    public ResultPage<LawBriefDto> getThisTagOthers2(Integer pageNum, Integer pageSize, Long thisTag, Long thisLaw, Integer lawType) {
+        if (lawType == null) return lawTreeService.getMFDLawOther(pageNum, pageSize, thisTag, thisLaw);
+        else
+            switch (lawType) {
+                case 2:
+                    return lawTreeService.getLMFLawOther(pageNum, pageSize, thisTag, thisLaw);
+                case 3:
+                    return lawTreeService.getMSFLawOther(pageNum, pageSize, thisTag, thisLaw);
+                case 4:
+                    return lawTreeService.getXSFLawOther(pageNum, pageSize, thisTag, thisLaw);
+                case 5:
+                    return lawTreeService.getXFLawOther(pageNum, pageSize, thisTag, thisLaw);
+                default:
+                    return lawTreeService.getMFDLawOther(pageNum, pageSize, thisTag, thisLaw);
+            }
     }
 
     @Transactional
@@ -222,16 +277,21 @@ public class LawServiceImpl implements LawService {
     }
 
     @Override
-    public Result getLawTree(Long lawId) {
-        TreeNode treeNode = generateLawTree();
-        Map<String, Object> map = new HashMap<>();
-        map.put("tree", treeNode);
-        Long nodeId = catalogMapper.getNodeId(lawId);
-        if(nodeId!=null){
-            List parentList = getParentList(nodeId);
-            map.put("parentList", parentList);
-        }
-        return Result.success(map);
+    public Result getLawTree(Long lawId, Integer lawType) {
+        if (lawType == null) return lawTreeService.getMFDLawTree(lawId, lawType);
+        else
+            switch (lawType) {
+                case 2:
+                    return lawTreeService.getLMFLawTree(lawId, lawType);
+                case 3:
+                    return lawTreeService.getMSFLawTree(lawId, lawType);
+                case 4:
+                    return lawTreeService.getXSFLawTree(lawId, lawType);
+                case 5:
+                    return lawTreeService.getXFLawTree(lawId, lawType);
+                default:
+                    return lawTreeService.getMFDLawTree(lawId, lawType);
+            }
     }
 
     private List getParentList(Long nodeId) {
@@ -250,22 +310,58 @@ public class LawServiceImpl implements LawService {
 
 
     @Override
-    public Result addLawTree(TreeNode node) {
-        Integer content = catalogMapper.addNode(node);
-        LawTree = null;
-        return Result.success(content);
+    public Result addLawTree(TreeNode node, Integer lawType) {
+        if (lawType == null) return lawTreeService.addMFDLawTree(node, lawType);
+        else
+            switch (lawType) {
+                case 2:
+                    return lawTreeService.addLMFLawTree(node, lawType);
+                case 3:
+                    return lawTreeService.addMSFLawTree(node, lawType);
+                case 4:
+                    return lawTreeService.addXSFLawTree(node, lawType);
+                case 5:
+                    return lawTreeService.addXFLawTree(node, lawType);
+                default:
+                    return lawTreeService.addMFDLawTree(node, lawType);
+            }
     }
 
     @Override
-    public Result updLawTree(TreeNode node) {
-        LawTree = null;
-        return Result.success(catalogMapper.updNode(node));
+    public Result updLawTree(TreeNode node, Integer lawType) {
+        if (lawType == null) return lawTreeService.updMFDLawTree(node, lawType);
+        else
+            switch (lawType) {
+                case 2:
+                    return lawTreeService.updLMFLawTree(node, lawType);
+                case 3:
+                    return lawTreeService.updMSFLawTree(node, lawType);
+                case 4:
+                    return lawTreeService.updXSFLawTree(node, lawType);
+                case 5:
+                    return lawTreeService.updXFLawTree(node, lawType);
+                default:
+                    return lawTreeService.updMFDLawTree(node, lawType);
+            }
+       
     }
 
     @Override
-    public Result delLawTree(Long id) {
-        LawTree = null;
-        return Result.success(catalogMapper.delNode(id));
+    public Result delLawTree(Long id, Integer lawType) {
+        if (lawType == null) return lawTreeService.delMFDLawTree(id, lawType);
+        else
+            switch (lawType) {
+                case 2:
+                    return lawTreeService.delLMFLawTree(id, lawType);
+                case 3:
+                    return lawTreeService.delMSFLawTree(id, lawType);
+                case 4:
+                    return lawTreeService.delXSFLawTree(id, lawType);
+                case 5:
+                    return lawTreeService.delXFLawTree(id, lawType);
+                default:
+                    return lawTreeService.delMFDLawTree(id, lawType);
+            }
     }
 
     private TreeNode generateLawTree() {

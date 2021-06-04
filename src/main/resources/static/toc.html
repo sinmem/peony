@@ -48,6 +48,7 @@
             rVue = new Vue({
                 el: "#content",
                 data: {
+                    lawType:GetQueryString("lawType"),
                     remarkType: "REMARK",
                     content: "",
                     isAppendTo: false,
@@ -109,7 +110,7 @@
                             alert("要先选择节点")
                             return;
                         }
-                        $.get("/web/v1/law/delLawTree", {"id": this.selectLaw.id}, function (data) {
+                        $.get("/web/v1/law/delLawTree", {"id": this.selectLaw.id,  lawType:this.lawType}, function (data) {
                             console.log("law",data);
                         }, "json");
                     },
@@ -129,6 +130,7 @@
                             style:"catalog",
                             extra:$("#style").val().trim(),
                             parent:this.selectLaw.id,
+                            lawType:this.lawType
                         }
                         $.post("/web/v1/law/addLawTree", data, function (data) {
                             console.log("law",data);
@@ -145,12 +147,16 @@
                 computed:{
                 }
             });
-            $.get("/web/v1/law/getLawTree", {"id": lawId}, function (data) {
-                console.log(data)
-                rVue.treeData = data.content.tree;
-                rVue.parentList = { arr:data.content.parentList }||{ arr:[0] };
-                console.log("catalogL: ", rVue.treeData);
-            }, "json");
+            setTimeout(function () {
+                let res = {"id": lawId, lawType:rVue.lawType}
+                console.log(res)
+                $.get("/web/v1/law/getLawTree",res, function (data) {
+                    console.log(data)
+                    rVue.treeData = data.content.tree;
+                    rVue.parentList = { arr:data.content.parentList }||{ arr:[0] };
+                    console.log("catalogL: ", rVue.treeData);
+                }, "json");
+            },500)
         });
     </script>
 </head>
